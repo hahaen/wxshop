@@ -16,56 +16,61 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/api")
 public class AutoController {
-	private final AutoService autoService;
-	private final TelVerificationService telVerificationService;
+    private final AutoService autoService;
+    private final TelVerificationService telVerificationService;
 
-	@Autowired
-	public AutoController(AutoService autoService,
-						  TelVerificationService telVerificationService) {
-		this.autoService = autoService;
-		this.telVerificationService = telVerificationService;
-	}
+    @Autowired
+    public AutoController(AutoService autoService,
+                          TelVerificationService telVerificationService) {
+        this.autoService = autoService;
+        this.telVerificationService = telVerificationService;
+    }
 
 
-	@PostMapping("/code")
-	public void code(@RequestBody TelAndCode telAndCode,
-					 HttpServletResponse response) {
-		if (telVerificationService.verifyTelParameter(telAndCode)) {
-			autoService.sendVerificationCode(telAndCode.getTel());
-		} else {
-			response.setStatus(HttpStatus.BAD_REQUEST.value());
-		}
+    @PostMapping("/code")
+    public void code(@RequestBody TelAndCode telAndCode,
+                     HttpServletResponse response) {
+        if (telVerificationService.verifyTelParameter(telAndCode)) {
+            autoService.sendVerificationCode(telAndCode.getTel());
+        } else {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+        }
 
-	}
+    }
 
-	@PostMapping("/login")
-	public void login(@RequestBody TelAndCode telAndCode) {
-		UsernamePasswordToken token = new UsernamePasswordToken(
-				telAndCode.getTel(),
-				telAndCode.getCode());
-		token.setRememberMe(true);
+    @PostMapping("/login")
+    public void login(@RequestBody TelAndCode telAndCode) {
+        UsernamePasswordToken token = new UsernamePasswordToken(
+                telAndCode.getTel(),
+                telAndCode.getCode());
+        token.setRememberMe(true);
 
-		SecurityUtils.getSubject().login(token);
-	}
+        SecurityUtils.getSubject().login(token);
+    }
 
-	public static class TelAndCode {
-		private String tel;
-		private String code;
+    public static class TelAndCode {
+        private String tel;
+        private String code;
 
-		public String getTel() {
-			return tel;
-		}
+        public TelAndCode(String tel, String code) {
+            this.tel = tel;
+            this.code = code;
+        }
 
-		public void setTel(String tel) {
-			this.tel = tel;
-		}
+        public String getTel() {
+            return tel;
+        }
 
-		public String getCode() {
-			return code;
-		}
+        public void setTel(String tel) {
+            this.tel = tel;
+        }
 
-		public void setCode(String code) {
-			this.code = code;
-		}
-	}
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+    }
 }
