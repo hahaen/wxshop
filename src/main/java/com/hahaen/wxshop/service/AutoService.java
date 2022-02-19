@@ -1,6 +1,5 @@
 package com.hahaen.wxshop.service;
 
-import com.hahaen.wxshop.generate.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ public class AutoService {
 
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     public void sendVerificationCode(String tel) {
-        User user = userService.createUserIfNotExist(tel);
+        userService.createUserIfNotExist(tel);
         String correctCode = smsCodeService.sendSmsCode(tel);
         verificationCodeCheckService.addCode(tel, correctCode);
     }

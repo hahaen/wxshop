@@ -1,26 +1,26 @@
 package com.hahaen.wxshop;
 
+import com.hahaen.wxshop.entity.LoginResponse;
+import com.hahaen.wxshop.generate.User;
 import com.hahaen.wxshop.service.AutoService;
 import com.hahaen.wxshop.service.TelVerificationService;
+import com.hahaen.wxshop.service.UserContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
-@Controller
+@RestController
 @RequestMapping("/api")
-public class AutoController {
+public class AuthController {
     private final AutoService autoService;
     private final TelVerificationService telVerificationService;
 
-    @Autowired
-    public AutoController(AutoService autoService,
+    public AuthController(AutoService autoService,
                           TelVerificationService telVerificationService) {
         this.autoService = autoService;
         this.telVerificationService = telVerificationService;
@@ -46,6 +46,17 @@ public class AutoController {
         token.setRememberMe(true);
 
         SecurityUtils.getSubject().login(token);
+    }
+
+    @PostMapping("/logout")
+    public void logout() {
+        SecurityUtils.getSubject().logout();
+    }
+
+    @GetMapping("/status")
+    public Object loginStatus() {
+        User user = UserContext.getCurrentUser();
+        return user == null ? new HashMap<>() : user;
     }
 
     public static class TelAndCode {

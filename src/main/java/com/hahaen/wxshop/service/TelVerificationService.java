@@ -1,6 +1,6 @@
 package com.hahaen.wxshop.service;
 
-import com.hahaen.wxshop.AutoController;
+import com.hahaen.wxshop.AuthController;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
@@ -16,7 +16,7 @@ public class TelVerificationService {
      * @param param 输入的参数
      * @return true 合法，否则返回false
      */
-    public boolean verifyTelParameter(AutoController.TelAndCode param) {
+    public boolean verifyTelParameter(AuthController.TelAndCode param) {
         if (param == null) {
             return false;
         } else if (param.getTel() == null) {

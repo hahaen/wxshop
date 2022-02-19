@@ -1,20 +1,34 @@
 package com.hahaen.wxshop.config;
 
 import com.hahaen.wxshop.service.ShiroRealm;
+import com.hahaen.wxshop.service.UserLoginInterceptor;
+import com.hahaen.wxshop.service.UserService;
 import com.hahaen.wxshop.service.VerificationCodeCheckService;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.apache.shiro.mgt.SecurityManager;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class ShiroConfig {
+public class ShiroConfig implements WebMvcConfigurer {
+    @Autowired
+    UserService userService;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new UserLoginInterceptor(userService));
+    }
+
     @Bean
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
@@ -23,6 +37,8 @@ public class ShiroConfig {
         Map<String, String> patten = new HashMap<>();
         patten.put("/api/code", "anon");
         patten.put("/api/login", "anon");
+        patten.put("/api/status", "anon");
+        patten.put("/api/logout", "anon");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(patten);
         return shiroFilterFactoryBean;
@@ -34,7 +50,8 @@ public class ShiroConfig {
 
         securityManager.setRealm(shiroRealm);
         securityManager.setCacheManager(new MemoryConstrainedCacheManager());
-        securityManager.setSessionManager(new DefaultSessionManager());
+        securityManager.setSessionManager(new DefaultWebSessionManager());
+        SecurityUtils.setSecurityManager(securityManager);
         return securityManager;
     }
 

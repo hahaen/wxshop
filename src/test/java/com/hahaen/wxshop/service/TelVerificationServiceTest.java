@@ -1,12 +1,13 @@
 package com.hahaen.wxshop.service;
 
-import com.hahaen.wxshop.AutoController;
+import com.hahaen.wxshop.AuthController;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class TelVerificationServiceTest {
-    public static AutoController.TelAndCode VALID_PARAMETER = new AutoController.TelAndCode("13012345678", null);
-    public static AutoController.TelAndCode EMPTY_TEL = new AutoController.TelAndCode(null, null);
+    public static AuthController.TelAndCode VALID_PARAMETER = new AuthController.TelAndCode("13012345678", null);
+    public static AuthController.TelAndCode VALID_PARAMETER_CODE = new AuthController.TelAndCode("13012345678", "000000");
+    public static AuthController.TelAndCode EMPTY_TEL = new AuthController.TelAndCode(null, null);
 
     @Test
     public void returnTrueIfValid() {
