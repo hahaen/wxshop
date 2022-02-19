@@ -1,18 +1,15 @@
 package com.hahaen.wxshop;
 
 import com.hahaen.wxshop.entity.LoginResponse;
-import com.hahaen.wxshop.generate.User;
 import com.hahaen.wxshop.service.AutoService;
 import com.hahaen.wxshop.service.TelVerificationService;
 import com.hahaen.wxshop.service.UserContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api")
@@ -55,8 +52,11 @@ public class AuthController {
 
     @GetMapping("/status")
     public Object loginStatus() {
-        User user = UserContext.getCurrentUser();
-        return user == null ? new HashMap<>() : user;
+        if (UserContext.getCurrentUser() == null) {
+            return LoginResponse.notLogin();
+        } else {
+            return LoginResponse.login(UserContext.getCurrentUser());
+        }
     }
 
     public static class TelAndCode {

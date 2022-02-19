@@ -4,7 +4,6 @@ import com.hahaen.wxshop.service.ShiroRealm;
 import com.hahaen.wxshop.service.UserLoginInterceptor;
 import com.hahaen.wxshop.service.UserService;
 import com.hahaen.wxshop.service.VerificationCodeCheckService;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -51,7 +50,7 @@ public class ShiroConfig implements WebMvcConfigurer {
         securityManager.setRealm(shiroRealm);
         securityManager.setCacheManager(new MemoryConstrainedCacheManager());
         securityManager.setSessionManager(new DefaultWebSessionManager());
-        SecurityUtils.setSecurityManager(securityManager);
+
         return securityManager;
     }
 
