@@ -1,4 +1,4 @@
-package com.hahaen.wxshop;
+package com.hahaen.wxshop.controller;
 
 import com.hahaen.wxshop.entity.LoginResponse;
 import com.hahaen.wxshop.service.AutoService;

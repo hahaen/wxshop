@@ -1,6 +1,6 @@
 package com.hahaen.wxshop.service;
 
-import com.hahaen.wxshop.AuthController;
+import com.hahaen.wxshop.controller.AuthController;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

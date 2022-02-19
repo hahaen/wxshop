@@ -1,6 +1,6 @@
 package com.hahaen.wxshop.service;
 
-import com.hahaen.wxshop.AuthController;
+import com.hahaen.wxshop.controller.AuthController;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
