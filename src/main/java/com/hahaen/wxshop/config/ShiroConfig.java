@@ -38,6 +38,7 @@ public class ShiroConfig implements WebMvcConfigurer {
         patten.put("/api/login", "anon");
         patten.put("/api/status", "anon");
         patten.put("/api/logout", "anon");
+        patten.put("/**", "authc");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(patten);
         return shiroFilterFactoryBean;
