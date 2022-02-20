@@ -166,9 +166,9 @@
                     </execution>
                     <execution>
                         <id>default-check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
+<!--                        <goals>-->
+<!--                            <goal>check</goal>-->
+<!--                        </goals>-->
                         <configuration>
                             <rules>
                                 <rule>
@@ -177,7 +177,7 @@
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.20</minimum>
+                                            <minimum>0.60</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

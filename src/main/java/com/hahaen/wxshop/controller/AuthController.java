@@ -23,7 +23,6 @@ public class AuthController {
         this.telVerificationService = telVerificationService;
     }
 
-
     @PostMapping("/code")
     public void code(@RequestBody TelAndCode telAndCode,
                      HttpServletResponse response) {
