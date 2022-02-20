@@ -1,4 +1,4 @@
-package com.hahaen.wxshop;
+package com.hahaen.wxshop.dao;
 
 import com.hahaen.wxshop.generate.User;
 import com.hahaen.wxshop.generate.UserExample;
