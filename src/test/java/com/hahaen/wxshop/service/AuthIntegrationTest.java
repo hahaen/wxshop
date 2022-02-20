@@ -20,8 +20,7 @@ import java.util.Map;
 
 import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER;
 import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER_CODE;
-import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = WxshopApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -114,6 +113,15 @@ public class AuthIntegrationTest {
                 .send(objectMapper.writeValueAsString(VALID_PARAMETER))
                 .code();
         Assertions.assertEquals(HTTP_OK, responseCode);
+    }
+
+    @Test
+    public void returnUnauthorizedIfNotLogin() {
+        int responseCode = HttpRequest.post(getUrl("/api/any"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .code();
+        Assertions.assertEquals(HTTP_UNAUTHORIZED, responseCode);
     }
 
     @Test

@@ -1,5 +1,8 @@
 package com.hahaen.wxshop;
 
+import com.hahaen.wxshop.generate.User;
+import com.hahaen.wxshop.generate.UserExample;
+import com.hahaen.wxshop.generate.UserMapper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

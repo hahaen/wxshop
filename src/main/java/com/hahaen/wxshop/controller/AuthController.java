@@ -1,7 +1,7 @@
 package com.hahaen.wxshop.controller;
 
 import com.hahaen.wxshop.entity.LoginResponse;
-import com.hahaen.wxshop.service.AutoService;
+import com.hahaen.wxshop.service.AuthService;
 import com.hahaen.wxshop.service.TelVerificationService;
 import com.hahaen.wxshop.service.UserContext;
 import org.apache.shiro.SecurityUtils;
@@ -14,10 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api")
 public class AuthController {
-    private final AutoService autoService;
+    private final AuthService autoService;
     private final TelVerificationService telVerificationService;
 
-    public AuthController(AutoService autoService,
+    public AuthController(AuthService autoService,
                           TelVerificationService telVerificationService) {
         this.autoService = autoService;
         this.telVerificationService = telVerificationService;

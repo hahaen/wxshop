@@ -5,14 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AutoService {
+public class AuthService {
     private final UserService userService;
     private final VerificationCodeCheckService verificationCodeCheckService;
     private final SmsCodeService smsCodeService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     @Autowired
-    public AutoService(UserService userService,
+    public AuthService(UserService userService,
                        VerificationCodeCheckService verificationCodeCheckService,
                        SmsCodeService smsCodeService) {
         this.userService = userService;

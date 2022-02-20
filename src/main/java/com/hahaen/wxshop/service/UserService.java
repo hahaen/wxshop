@@ -1,6 +1,7 @@
 package com.hahaen.wxshop.service;
 
 import com.hahaen.wxshop.UserDao;
+import com.hahaen.wxshop.generate.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;

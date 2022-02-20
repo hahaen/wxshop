@@ -1,5 +1,6 @@
 package com.hahaen.wxshop.entity;
 
+import com.hahaen.wxshop.generate.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @SuppressFBWarnings("EI_EXPOSE_REP")
