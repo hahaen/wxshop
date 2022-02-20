@@ -1,9 +1,10 @@
 package com.hahaen.wxshop.config;
 
 import com.hahaen.wxshop.service.ShiroRealm;
-import com.hahaen.wxshop.service.UserLoginInterceptor;
+import com.hahaen.wxshop.service.UserContext;
 import com.hahaen.wxshop.service.UserService;
 import com.hahaen.wxshop.service.VerificationCodeCheckService;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -12,10 +13,14 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,7 +32,22 @@ public class ShiroConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new UserLoginInterceptor(userService));
+        registry.addInterceptor(new HandlerInterceptor() {
+            @Override
+            public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                Object tel = SecurityUtils.getSubject().getPrincipal();
+                if (tel != null) {
+                    //说明已经登录了
+                    userService.getUserByTel(tel.toString()).ifPresent(UserContext::setCurrentUser);
+                }
+                return true;
+            }
+
+            @Override
+            public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+                UserContext.clearCurrentUser();
+            }
+        });
     }
 
     @Bean
@@ -58,7 +78,7 @@ public class ShiroConfig implements WebMvcConfigurer {
         securityManager.setRealm(shiroRealm);
         securityManager.setCacheManager(new MemoryConstrainedCacheManager());
         securityManager.setSessionManager(new DefaultWebSessionManager());
-
+        SecurityUtils.setSecurityManager(securityManager);
         return securityManager;
     }
 
