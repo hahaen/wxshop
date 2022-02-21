@@ -50,7 +50,7 @@ public class GoodsController {
     public Response<Goods> deleteGoods(@PathVariable("id") Long goodsId, HttpServletResponse response) {
         try {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            return Response.of(goodsService.deletegoodsById(goodsId));
+            return Response.of(goodsService.deleteGoodsById(goodsId));
         } catch (GoodsService.NotAuthorizedForShopException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return Response.of(e.getMessage(), null);

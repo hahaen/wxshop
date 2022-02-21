@@ -3,12 +3,14 @@ package com.hahaen.wxshop.dao;
 import com.hahaen.wxshop.entity.DataStatus;
 import com.hahaen.wxshop.generate.Goods;
 import com.hahaen.wxshop.generate.GoodsMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GoodsDao {
     private final GoodsMapper goodsMapper;
 
+    @Autowired
     public GoodsDao(GoodsMapper goodsMapper) {
         this.goodsMapper = goodsMapper;
     }
