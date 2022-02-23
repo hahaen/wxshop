@@ -1,6 +1,6 @@
 package com.hahaen.wxshop.controller;
 
-import com.hahaen.wxshop.dao.GoodsDao;
+import com.hahaen.wxshop.entity.PageResponse;
 import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.generate.Goods;
 import com.hahaen.wxshop.service.GoodsService;
@@ -20,7 +20,12 @@ public class GoodsController {
         this.goodsService = goodsService;
     }
 
-    public void getGoods() {
+    @GetMapping("/goods")
+    public @ResponseBody
+    PageResponse<Goods> getGoods(@RequestParam("pageNum") Integer pageNum,
+                                 @RequestParam("pageSize") Integer pageSize,
+                                 @RequestParam(value = "shopId", required = false) Integer shopId) {
+        return goodsService.getGoods(pageNum, pageSize, shopId);
     }
 
 
@@ -54,7 +59,7 @@ public class GoodsController {
         } catch (GoodsService.NotAuthorizedForShopException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return Response.of(e.getMessage(), null);
-        } catch (GoodsDao.ResourceNotFoundException e) {
+        } catch (GoodsService.ResourceNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return Response.of(e.getMessage(), null);
         }

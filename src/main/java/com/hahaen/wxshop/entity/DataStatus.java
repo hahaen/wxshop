@@ -1,5 +1,12 @@
 package com.hahaen.wxshop.entity;
 
-public class DataStatus {
-    public static String DELETE_STATUS = "deleted";
+public enum DataStatus {
+    OK(),
+    DELETED();
+
+    public String getName() {
+        return name().toLowerCase();
+    }
 }
+
+
