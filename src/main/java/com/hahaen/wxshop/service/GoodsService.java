@@ -23,9 +23,25 @@ public class GoodsService {
     public Goods createGoods(Goods goods) {
         Shop shop = shopMapper.selectByPrimaryKey(goods.getShopId());
 
-        if (Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
+        if (shop == null || Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
             long id = goodsMapper.insert(goods);
             goods.setId(id);
+            return goods;
+        } else {
+            throw new NotAuthorizedForShopException("无权访问！");
+        }
+    }
+
+    public Goods updateGoods(Goods goods) {
+        Shop shop = shopMapper.selectByPrimaryKey(goods.getShopId());
+
+        if (Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
+            GoodsExample byId = new GoodsExample();
+            byId.createCriteria().andIdEqualTo(goods.getId());
+            int affectedRows = goodsMapper.updateByExample(goods, byId);
+            if (affectedRows == 0) {
+                throw new ResourceNotFoundException("未找到");
+            }
             return goods;
         } else {
             throw new NotAuthorizedForShopException("无权访问！");
@@ -35,7 +51,7 @@ public class GoodsService {
     public Goods deleteGoodsById(Long goodsId) {
         Shop shop = shopMapper.selectByPrimaryKey(goodsId);
 
-        if (Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
+        if (shop == null || Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
             Goods goods = goodsMapper.selectByPrimaryKey(goodsId);
             if (goods == null) {
                 throw new ResourceNotFoundException("商品未找到！");

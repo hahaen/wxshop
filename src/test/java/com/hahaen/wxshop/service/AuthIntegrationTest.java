@@ -11,11 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
-import java.util.Map;
-
 import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER;
-import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER_CODE;
 import static java.net.HttpURLConnection.*;
 
 @ExtendWith(SpringExtension.class)
@@ -36,7 +32,7 @@ public class AuthIntegrationTest extends AbstractIntegrationTest {
         // 调用/api/logout,注销登录
         // 注意：注销登录也需要带Cookie
         doHttpRequest("/api/logout", false, null, sessionId);
-        
+
         // 再次带着Cookie访问/api/status 恢复成为未登录状态
         statusResponse = doHttpRequest("/api/v1/status", true, null, sessionId).body;
 

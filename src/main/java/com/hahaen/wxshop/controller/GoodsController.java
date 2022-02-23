@@ -47,8 +47,16 @@ public class GoodsController {
         goods.setUpdatedAt(new Date());
     }
 
-
-    public void updateGoods() {
+    public Response<Goods> updateGoods(Goods goods, HttpServletResponse response) {
+        try {
+            return Response.of(goodsService.updateGoods(goods));
+        } catch (GoodsService.NotAuthorizedForShopException e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return Response.of(e.getMessage(), null);
+        } catch (GoodsService.ResourceNotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return Response.of(e.getMessage(), null);
+        }
     }
 
     @DeleteMapping("goods/{id}")
