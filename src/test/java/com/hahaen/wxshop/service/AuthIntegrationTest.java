@@ -21,20 +21,20 @@ public class AuthIntegrationTest extends AbstractIntegrationTest {
     @Test
     public void loginLogoutTest() throws JsonProcessingException {
 
-        String sessionId = loginAndGetCookie();
+        String sessionId = loginAndGetCookie().cookie;
 
         //带着Cookie访问，/api/status 处于登录状态
-        String statusResponse = doHttpRequest("/api/v1/status", true, null, sessionId).body;
+        String statusResponse = doHttpRequest("/api/v1/status", "GET", null, sessionId).body;
         LoginResponse response = objectMapper.readValue(statusResponse, LoginResponse.class);
         Assertions.assertTrue(response.isLogin());
         Assertions.assertEquals(VALID_PARAMETER.getTel(), response.getUser().getTel());
 
         // 调用/api/logout,注销登录
         // 注意：注销登录也需要带Cookie
-        doHttpRequest("/api/logout", false, null, sessionId);
+        doHttpRequest("/api/logout", "POST", null, sessionId);
 
         // 再次带着Cookie访问/api/status 恢复成为未登录状态
-        statusResponse = doHttpRequest("/api/v1/status", true, null, sessionId).body;
+        statusResponse = doHttpRequest("/api/v1/status", "GET", null, sessionId).body;
 
         response = objectMapper.readValue(statusResponse, LoginResponse.class);
         Assertions.assertFalse(response.isLogin());

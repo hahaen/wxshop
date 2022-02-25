@@ -1,9 +1,13 @@
 package com.hahaen.wxshop.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.hahaen.wxshop.entity.LoginResponse;
+import com.hahaen.wxshop.entity.Response;
+import com.hahaen.wxshop.generate.Shop;
+import com.hahaen.wxshop.generate.User;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.ClassicConfiguration;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +24,7 @@ import java.util.Map;
 import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER;
 import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER_CODE;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(properties = {"spring.config.location=classpath:test-application.yml"})
 public class AbstractIntegrationTest {
@@ -49,27 +54,30 @@ public class AbstractIntegrationTest {
         return "http://localhost:" + environment.getProperty("local.server.port") + apiName;
     }
 
-    public String loginAndGetCookie() throws JsonProcessingException {
+    public UserLoginResponse loginAndGetCookie() throws JsonProcessingException {
         //最开始默认情况下，/api/status 处于未登录状态
-        String statusResponse = doHttpRequest("/api/v1/status", true, null, null).body;
-
-        LoginResponse response = objectMapper.readValue(statusResponse, LoginResponse.class);
-        Assertions.assertFalse(response.isLogin());
+        String statusResponse = doHttpRequest("/api/v1/status", "GET", null, null).body;
+        LoginResponse stutasResponseData = objectMapper.readValue(statusResponse, LoginResponse.class);
+        assertFalse(stutasResponseData.isLogin());
 
         // 发送验证码
-        int responseCode = doHttpRequest("/api/v1/code", false, VALID_PARAMETER, null).code;
+        int responseCode = doHttpRequest("/api/v1/code", "POST", VALID_PARAMETER, null).code;
 
-        Assertions.assertEquals(HTTP_OK, responseCode);
+        assertEquals(HTTP_OK, responseCode);
 
         //带着验证码进行登录，得到Cookie
-        Map<String, List<String>> responseHeaders = doHttpRequest("/api/v1/login", false, VALID_PARAMETER_CODE, null).headers;
-
-        List<String> setCookie = responseHeaders.get("Set-Cookie");
-        return getSessionIdFromSetCookie(
+        HttpResponse loginResponse = doHttpRequest("/api/v1/login", "POST", VALID_PARAMETER, null);
+        List<String> setCookie = loginResponse.headers.get("Set-Cookie");
+        String cookie = getSessionIdFromSetCookie(
                 setCookie.stream()
-                        .filter(cookie -> cookie.contains("JSESSIONID"))
+                        .filter(c -> c.contains("JSESSIONID"))
                         .findFirst()
                         .get());
+
+        statusResponse = doHttpRequest("/api/v1/status", "GET", null, cookie).body;
+        stutasResponseData = objectMapper.readValue(statusResponse, LoginResponse.class);
+
+        return new UserLoginResponse(cookie, stutasResponseData.getUser());
     }
 
     public String getSessionIdFromSetCookie(String setCookie) {
@@ -77,6 +85,16 @@ public class AbstractIntegrationTest {
 
         return setCookie.substring(0, semiColonIndex);
 
+    }
+
+    public static class UserLoginResponse {
+        String cookie;
+        User user;
+
+        public UserLoginResponse(String cookie, User user) {
+            this.cookie = cookie;
+            this.user = user;
+        }
     }
 
     public class HttpResponse {
@@ -91,8 +109,8 @@ public class AbstractIntegrationTest {
         }
     }
 
-    public HttpResponse doHttpRequest(String apiName, boolean isGet, Object requestBody, String cookie) throws JsonProcessingException {
-        HttpRequest request = isGet ? HttpRequest.get(getUrl(apiName)) : HttpRequest.post(getUrl(apiName));
+    public HttpResponse doHttpRequest(String apiName, String httpMethod, Object requestBody, String cookie) throws JsonProcessingException {
+        HttpRequest request = new HttpRequest(getUrl(apiName), httpMethod);
         if (cookie != null) {
             request.header("Cookie", cookie);
         }

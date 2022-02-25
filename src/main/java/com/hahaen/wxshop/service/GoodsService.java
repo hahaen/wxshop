@@ -1,6 +1,7 @@
 package com.hahaen.wxshop.service;
 
 import com.hahaen.wxshop.entity.DataStatus;
+import com.hahaen.wxshop.entity.HttpException;
 import com.hahaen.wxshop.entity.PageResponse;
 import com.hahaen.wxshop.generate.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,12 @@ public class GoodsService {
         Shop shop = shopMapper.selectByPrimaryKey(goods.getShopId());
 
         if (shop == null || Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
+            goods.setStatus(DataStatus.OK.getName());
             long id = goodsMapper.insert(goods);
             goods.setId(id);
             return goods;
         } else {
-            throw new NotAuthorizedForShopException("无权访问！");
+            throw HttpException.forbidden("无权访问！");
         }
     }
 
@@ -40,11 +42,11 @@ public class GoodsService {
             byId.createCriteria().andIdEqualTo(goods.getId());
             int affectedRows = goodsMapper.updateByExample(goods, byId);
             if (affectedRows == 0) {
-                throw new ResourceNotFoundException("未找到");
+                throw HttpException.notFound("未找到");
             }
             return goods;
         } else {
-            throw new NotAuthorizedForShopException("无权访问！");
+            throw HttpException.forbidden("无权访问！");
         }
     }
 
@@ -54,20 +56,14 @@ public class GoodsService {
         if (shop == null || Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
             Goods goods = goodsMapper.selectByPrimaryKey(goodsId);
             if (goods == null) {
-                throw new ResourceNotFoundException("商品未找到！");
+                throw HttpException.notFound("商品未找到！");
             }
 
             goods.setStatus(DataStatus.DELETED.getName());
             goodsMapper.updateByPrimaryKey(goods);
             return goods;
         } else {
-            throw new NotAuthorizedForShopException("无权访问！");
-        }
-    }
-
-    public static class ResourceNotFoundException extends RuntimeException {
-        public ResourceNotFoundException(String message) {
-            super(message);
+            throw HttpException.forbidden("无权访问！");
         }
     }
 
@@ -95,12 +91,6 @@ public class GoodsService {
                     .andShopIdEqualTo(shopId.longValue());
 
             return (int) goodsMapper.countByExample(goodsExample);
-        }
-    }
-
-    public static class NotAuthorizedForShopException extends RuntimeException {
-        public NotAuthorizedForShopException(String message) {
-            super(message);
         }
     }
 }
