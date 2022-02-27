@@ -5,28 +5,23 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.hahaen.wxshop.entity.LoginResponse;
-import com.hahaen.wxshop.entity.Response;
-import com.hahaen.wxshop.generate.Shop;
 import com.hahaen.wxshop.generate.User;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.ClassicConfiguration;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 import java.util.Map;
 
 import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER;
-import static com.hahaen.wxshop.service.TelVerificationServiceTest.VALID_PARAMETER_CODE;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@TestPropertySource(properties = {"spring.config.location=classpath:test-application.yml"})
 public class AbstractIntegrationTest {
     @Autowired
     Environment environment;
@@ -47,7 +42,7 @@ public class AbstractIntegrationTest {
         flyway.migrate();
     }
 
-    public ObjectMapper objectMapper = new ObjectMapper();
+    public static ObjectMapper objectMapper = new ObjectMapper();
 
     public String getUrl(String apiName) {
         // 获取集成测试的端口号
@@ -106,6 +101,10 @@ public class AbstractIntegrationTest {
             this.code = code;
             this.body = body;
             this.headers = headers;
+        }
+
+        public <T> T asJsonObjict(TypeReference<T> tTypeReference) throws JsonProcessingException {
+            return objectMapper.readValue(body, tTypeReference);
         }
     }
 

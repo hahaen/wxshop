@@ -3,8 +3,8 @@ package com.hahaen.wxshop.service;
 import com.hahaen.wxshop.dao.UserDao;
 import com.hahaen.wxshop.generate.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -27,7 +27,7 @@ public class UserService {
         user.setUpdatedAt(new Date());
         try {
             userDao.insertUser(user);
-        } catch (PersistenceException e) {
+        } catch (DuplicateKeyException e) {
             return userDao.getUserByTel(tel);
         }
         return user;
