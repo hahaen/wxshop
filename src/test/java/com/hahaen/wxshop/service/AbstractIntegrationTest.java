@@ -103,7 +103,7 @@ public class AbstractIntegrationTest {
             this.headers = headers;
         }
 
-        public <T> T asJsonObjict(TypeReference<T> tTypeReference) throws JsonProcessingException {
+        public <T> T asJsonObject(TypeReference<T> tTypeReference) throws JsonProcessingException {
             return objectMapper.readValue(body, tTypeReference);
         }
     }

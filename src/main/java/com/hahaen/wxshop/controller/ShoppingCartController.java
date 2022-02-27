@@ -1,6 +1,8 @@
 package com.hahaen.wxshop.controller;
 
+import com.hahaen.wxshop.entity.HttpException;
 import com.hahaen.wxshop.entity.PageResponse;
+import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.entity.ShoppingCartData;
 import com.hahaen.wxshop.service.ShoppingCartService;
 import com.hahaen.wxshop.service.UserContext;
@@ -29,10 +31,13 @@ public class ShoppingCartController {
     }
 
 
-
     @PostMapping("/shoppingCart")
-    public void addToShoppingCart(@RequestBody AddToShoppingCartRequest request) {
-
+    public Response<ShoppingCartData> addToShoppingCart(@RequestBody AddToShoppingCartRequest request) {
+        try {
+            return Response.of(shoppingCartService.addToShoppingCart(request));
+        } catch (HttpException e) {
+            return Response.of(e.getMessage(), null);
+        }
     }
 
     public static class AddToShoppingCartRequest {
