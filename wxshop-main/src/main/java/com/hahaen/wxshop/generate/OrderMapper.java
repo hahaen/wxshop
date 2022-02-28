@@ -1,7 +1,5 @@
 package com.hahaen.wxshop.generate;
 
-import com.hahaen.wxshop.generate.Order;
-import com.hahaen.wxshop.generate.OrderExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

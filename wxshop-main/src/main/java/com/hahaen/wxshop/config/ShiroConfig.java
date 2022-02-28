@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 @Configuration
 public class ShiroConfig implements WebMvcConfigurer {
+    @Autowired
     UserService userService;
 
     @Autowired

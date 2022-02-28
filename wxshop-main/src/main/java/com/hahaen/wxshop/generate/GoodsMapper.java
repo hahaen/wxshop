@@ -1,7 +1,5 @@
 package com.hahaen.wxshop.generate;
 
-import com.hahaen.wxshop.generate.Goods;
-import com.hahaen.wxshop.generate.GoodsExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
