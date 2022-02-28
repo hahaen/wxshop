@@ -8,5 +8,3 @@ public enum DataStatus {
         return name().toLowerCase();
     }
 }
-
-

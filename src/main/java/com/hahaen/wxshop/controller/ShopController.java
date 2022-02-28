@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/v1")
 public class ShopController {
-
     private ShopService shopService;
 
     @Autowired
@@ -24,15 +23,13 @@ public class ShopController {
     }
 
     @GetMapping("/shop")
-    public PageResponse<Shop> getShop(@RequestParam("pageNum") Integer pageNum,
-                                      @RequestParam("pageSize") Integer pageSize) {
+    public PageResponse<Shop> getShop(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         return shopService.getShopByUserId(UserContext.getCurrentUser().getId(), pageNum, pageSize);
     }
 
     @PostMapping("/shop")
-    public Response<Shop> createShop(@RequestBody Shop shop,
-                                     HttpServletResponse response) {
-        Response<Shop> ret = Response.of(shopService.createdShop(shop, UserContext.getCurrentUser().getId()));
+    public Response<Shop> createShop(@RequestBody Shop shop, HttpServletResponse response) {
+        Response<Shop> ret = Response.of(shopService.createShop(shop, UserContext.getCurrentUser().getId()));
         response.setStatus(HttpStatus.CREATED.value());
         return ret;
     }
@@ -51,8 +48,7 @@ public class ShopController {
     }
 
     @DeleteMapping("/shop/{id}")
-    public Response<Shop> deleteShop(@PathVariable("id") Long shopId,
-                                     HttpServletResponse response) {
+    public Response<Shop> deleteShop(@PathVariable("id") Long shopId, HttpServletResponse response) {
         try {
             return Response.of(shopService.deleteShop(shopId, UserContext.getCurrentUser().getId()));
         } catch (HttpException e) {

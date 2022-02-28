@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 public class ShoppingCartController {
-    private ShoppingCartService shoppingCartService;
+    private final ShoppingCartService shoppingCartService;
 
     @Autowired
     public ShoppingCartController(ShoppingCartService shoppingCartService) {
@@ -22,14 +22,14 @@ public class ShoppingCartController {
     }
 
     @GetMapping("/shoppingCart")
-    public PageResponse<ShoppingCartData> getShoppingCart(@RequestParam("pageNum") int pageNum,
-                                                          @RequestParam("pageSize") int pageSize) {
-        return shoppingCartService.getShoppingCartOfUser(
-                UserContext.getCurrentUser().getId(),
+    public PageResponse<ShoppingCartData> getShoppingCart(
+            @RequestParam("pageNum") int pageNum,
+            @RequestParam("pageSize") int pageSize
+    ) {
+        return shoppingCartService.getShoppingCartOfUser(UserContext.getCurrentUser().getId(),
                 pageNum,
                 pageSize);
     }
-
 
     @PostMapping("/shoppingCart")
     public Response<ShoppingCartData> addToShoppingCart(@RequestBody AddToShoppingCartRequest request) {
@@ -73,9 +73,8 @@ public class ShoppingCartController {
         }
     }
 
-
-    @DeleteMapping("shoppingCart/{id}")
-    public Response<ShoppingCartData> deleteShoppingCart(@PathVariable("id") Long goodsId) {
+    @DeleteMapping("/shoppingCart/{id}")
+    public Response<ShoppingCartData> deleteGoodsInShoppingCart(@PathVariable("id") Long goodsId) {
         try {
             return Response.of(shoppingCartService.deleteGoodsInShoppingCart(goodsId, UserContext.getCurrentUser().getId()));
         } catch (HttpException e) {

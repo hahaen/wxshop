@@ -26,10 +26,10 @@ public class ShopService {
         ShopExample countByStatus = new ShopExample();
         countByStatus.createCriteria().andStatusEqualTo(DataStatus.DELETED.getName());
         int totalNumber = (int) shopMapper.countByExample(countByStatus);
-
         int totalPage = totalNumber % pageSize == 0 ? totalNumber / pageSize : totalNumber / pageSize + 1;
+
         ShopExample pageCondition = new ShopExample();
-        pageCondition.createCriteria().andStatusEqualTo(DataStatus.DELETED.getName());
+        pageCondition.createCriteria().andStatusEqualTo(DataStatus.OK.getName());
         pageCondition.setLimit(pageSize);
         pageCondition.setOffset((pageNum - 1) * pageSize);
 
@@ -38,7 +38,7 @@ public class ShopService {
         return PageResponse.pagedData(pageNum, pageSize, totalPage, pagedShops);
     }
 
-    public Shop createdShop(Shop shop, Long creatorId) {
+    public Shop createShop(Shop shop, Long creatorId) {
         shop.setOwnerUserId(creatorId);
 
         shop.setCreatedAt(new Date());
@@ -54,8 +54,9 @@ public class ShopService {
         if (shopInDatabase == null) {
             throw HttpException.notFound("店铺未找到！");
         }
+
         if (!Objects.equals(shopInDatabase.getOwnerUserId(), userId)) {
-            throw HttpException.forbidden("无权访问!");
+            throw HttpException.forbidden("无权访问！");
         }
 
         shop.setUpdatedAt(new Date());
@@ -68,13 +69,13 @@ public class ShopService {
         if (shopInDatabase == null) {
             throw HttpException.notFound("店铺未找到！");
         }
+
         if (!Objects.equals(shopInDatabase.getOwnerUserId(), userId)) {
-            throw HttpException.forbidden("无权访问!");
+            throw HttpException.forbidden("无权访问！");
         }
 
         shopInDatabase.setStatus(DataStatus.DELETED.getName());
         shopInDatabase.setUpdatedAt(new Date());
-
         shopMapper.updateByPrimaryKey(shopInDatabase);
         return shopInDatabase;
     }

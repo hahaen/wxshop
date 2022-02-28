@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hahaen.wxshop.dao.ShoppingCartQueryMapper">
-    <select id="countHowManyShopsInUserShoppingCart" resultType="int" parameterType="Long">
+<mapper namespace="com.hcsp.wxshop.dao.ShoppingCartQueryMapper">
+    <select id="countHowManyShopsInUserShoppingCart" resultType="int" parameterType="long">
         SELECT COUNT(DISTINCT SHOPPING_CART.SHOP_ID)
         from SHOPPING_CART
         where USER_ID = #{userId}
           AND STATUS = 'ok'
     </select>
+
     <select id="selectShoppingCartDataByUserId" resultMap="getShoppingCartResultMap" parameterType="Map">
         SELECT SHOP.ID              as SHOP_ID,
                SHOP.NAME            as SHOP_NAME,
@@ -29,13 +30,14 @@
                  FROM SHOPPING_CART
                  WHERE USER_ID = #{userId}
                    AND STATUS = 'ok'
-                     LIMIT #{limit}
-                     , #{offset}
+                     LIMIT #{limit},#{offset}
              ) t1
                  JOIN SHOPPING_CART on t1.SHOP_ID = SHOPPING_CART.SHOP_ID
                  JOIN GOODS on SHOPPING_CART.GOODS_ID = GOODS.ID
                  JOIN SHOP on t1.SHOP_ID = SHOP.ID
+
     </select>
+
     <select id="selectShoppingCartDataByUserIdShopId" resultMap="getShoppingCartResultMap" parameterType="Map">
         SELECT SHOP.ID              as SHOP_ID,
                SHOP.NAME            as SHOP_NAME,
@@ -88,9 +90,9 @@
 
     <delete id="deleteShoppingCart" parameterType="Map">
         UPDATE SHOPPING_CART
-        SET STATUS     = 'deleted',
-            UPDATED_AT = now()
+        SET STATUS = 'deleted', UPDATED_AT = now()
         WHERE USER_ID = #{userId}
           AND GOODS_ID = #{goodsId}
     </delete>
+
 </mapper>

@@ -14,12 +14,12 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/v1")
 public class AuthController {
-    private final AuthService autoService;
+    private final AuthService authService;
     private final TelVerificationService telVerificationService;
 
-    public AuthController(AuthService autoService,
+    public AuthController(AuthService authService,
                           TelVerificationService telVerificationService) {
-        this.autoService = autoService;
+        this.authService = authService;
         this.telVerificationService = telVerificationService;
     }
 
@@ -27,11 +27,10 @@ public class AuthController {
     public void code(@RequestBody TelAndCode telAndCode,
                      HttpServletResponse response) {
         if (telVerificationService.verifyTelParameter(telAndCode)) {
-            autoService.sendVerificationCode(telAndCode.getTel());
+            authService.sendVerificationCode(telAndCode.getTel());
         } else {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
-
     }
 
     @PostMapping("/login")

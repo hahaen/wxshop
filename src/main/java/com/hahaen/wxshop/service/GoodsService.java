@@ -4,7 +4,6 @@ import com.hahaen.wxshop.entity.DataStatus;
 import com.hahaen.wxshop.entity.HttpException;
 import com.hahaen.wxshop.entity.PageResponse;
 import com.hahaen.wxshop.generate.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +14,6 @@ public class GoodsService {
     private GoodsMapper goodsMapper;
     private ShopMapper shopMapper;
 
-    @Autowired
     public GoodsService(GoodsMapper goodsMapper, ShopMapper shopMapper) {
         this.goodsMapper = goodsMapper;
         this.shopMapper = shopMapper;
@@ -24,7 +22,7 @@ public class GoodsService {
     public Goods createGoods(Goods goods) {
         Shop shop = shopMapper.selectByPrimaryKey(goods.getShopId());
 
-        if (shop == null || Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
+        if (Objects.equals(shop.getOwnerUserId(), UserContext.getCurrentUser().getId())) {
             goods.setStatus(DataStatus.OK.getName());
             long id = goodsMapper.insert(goods);
             goods.setId(id);
@@ -68,6 +66,7 @@ public class GoodsService {
     }
 
     public PageResponse<Goods> getGoods(Integer pageNum, Integer pageSize, Integer shopId) {
+
         int totalNumber = countGoods(shopId);
         int totalPage = totalNumber % pageSize == 0 ? totalNumber / pageSize : totalNumber / pageSize + 1;
 
@@ -76,6 +75,7 @@ public class GoodsService {
         page.setOffset((pageNum - 1) * pageSize);
 
         List<Goods> pagedGoods = goodsMapper.selectByExample(page);
+
         return PageResponse.pagedData(pageNum, pageSize, totalPage, pagedGoods);
     }
 
@@ -89,7 +89,6 @@ public class GoodsService {
             goodsExample.createCriteria()
                     .andStatusEqualTo(DataStatus.OK.getName())
                     .andShopIdEqualTo(shopId.longValue());
-
             return (int) goodsMapper.countByExample(goodsExample);
         }
     }

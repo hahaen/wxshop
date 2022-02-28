@@ -2,8 +2,6 @@ package com.hahaen.wxshop.service;
 
 import com.hahaen.wxshop.dao.UserDao;
 import com.hahaen.wxshop.generate.User;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +12,6 @@ import java.util.Optional;
 public class UserService {
     private final UserDao userDao;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    @Autowired
     public UserService(UserDao userDao) {
         this.userDao = userDao;
     }
@@ -30,7 +26,7 @@ public class UserService {
         } catch (DuplicateKeyException e) {
             return userDao.getUserByTel(tel);
         }
-        return user;
+        return new User();
     }
 
     /**
@@ -40,6 +36,6 @@ public class UserService {
      * @return 返回用户
      */
     public Optional<User> getUserByTel(String tel) {
-        return Optional.of(userDao.getUserByTel(tel));
+        return Optional.ofNullable(userDao.getUserByTel(tel));
     }
 }

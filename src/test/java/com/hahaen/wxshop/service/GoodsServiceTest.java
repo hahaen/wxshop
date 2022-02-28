@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -58,42 +59,45 @@ class GoodsServiceTest {
     }
 
     @Test
-    public void createGoodsFailedIfUserIsOwner() {
+    public void createGoodsFailedIfUserIsNotOwner() {
         when(shop.getOwnerUserId()).thenReturn(2L);
-        HttpException throwException = assertThrows(HttpException.class, () -> {
+        HttpException thrownException = assertThrows(HttpException.class, () -> {
             goodsService.createGoods(goods);
         });
 
-        assertEquals(403, throwException.getStatusCode());
+        assertEquals(403, thrownException.getStatusCode());
     }
 
     @Test
     public void throwExceptionIfGoodsNotFound() {
+        long goodsToBeDeleted = 123;
+
         when(shop.getOwnerUserId()).thenReturn(1L);
-        Long goodsToBeDeleted = 123L;
         when(goodsMapper.selectByPrimaryKey(goodsToBeDeleted)).thenReturn(null);
-        HttpException throwException = assertThrows(HttpException.class, () -> {
+        HttpException thrownException = assertThrows(HttpException.class, () -> {
             goodsService.deleteGoodsById(goodsToBeDeleted);
         });
 
-        assertEquals(404, throwException.getStatusCode());
+        assertEquals(404, thrownException.getStatusCode());
     }
 
     @Test
     public void deleteGoodsThrowExceptionIfUserIsNotOwner() {
+        long goodsToBeDeleted = 123;
+
         when(shop.getOwnerUserId()).thenReturn(2L);
-        Long goodsToBeDeleted = 123L;
-        HttpException throwException = assertThrows(HttpException.class, () -> {
+        HttpException thrownException = assertThrows(HttpException.class, () -> {
             goodsService.deleteGoodsById(goodsToBeDeleted);
         });
 
-        assertEquals(403, throwException.getStatusCode());
+        assertEquals(403, thrownException.getStatusCode());
     }
 
     @Test
     public void deleteGoodsSucceed() {
+        long goodsToBeDeleted = 123;
+
         when(shop.getOwnerUserId()).thenReturn(1L);
-        Long goodsToBeDeleted = 123L;
         when(goodsMapper.selectByPrimaryKey(goodsToBeDeleted)).thenReturn(goods);
         goodsService.deleteGoodsById(goodsToBeDeleted);
 
@@ -105,7 +109,7 @@ class GoodsServiceTest {
         int pageNumber = 5;
         int pageSize = 10;
 
-        List mockData = mock(List.class);
+        List<Goods> mockData = Mockito.mock(List.class);
 
         when(goodsMapper.countByExample(any())).thenReturn(55L);
         when(goodsMapper.selectByExample(any())).thenReturn(mockData);
@@ -122,7 +126,7 @@ class GoodsServiceTest {
         int pageNumber = 5;
         int pageSize = 10;
 
-        List mockData = mock(List.class);
+        List<Goods> mockData = Mockito.mock(List.class);
 
         when(goodsMapper.countByExample(any())).thenReturn(100L);
         when(goodsMapper.selectByExample(any())).thenReturn(mockData);
@@ -138,7 +142,6 @@ class GoodsServiceTest {
     public void updateGoodsSucceed() {
         when(shop.getOwnerUserId()).thenReturn(1L);
         when(goodsMapper.updateByExample(any(), any())).thenReturn(1);
-        goodsService.updateGoods(goods);
         assertEquals(goods, goodsService.updateGoods(goods));
     }
 }

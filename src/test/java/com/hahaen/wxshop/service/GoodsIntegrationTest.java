@@ -20,13 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(classes = WxshopApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"spring.config.location=classpath:test-application.yml"})
 public class GoodsIntegrationTest extends AbstractIntegrationTest {
+
     @Test
     public void testCreateGoods() throws JsonProcessingException {
         UserLoginResponse loginResponse = loginAndGetCookie();
 
         Shop shop = new Shop();
         shop.setName("我的微信店铺");
-        shop.setDescription("我的小店开张");
+        shop.setDescription("我的小店开张啦");
         shop.setImgUrl("http://shopUrl");
 
         HttpResponse shopResponse = doHttpRequest(
@@ -39,7 +40,7 @@ public class GoodsIntegrationTest extends AbstractIntegrationTest {
 
         assertEquals(SC_CREATED, shopResponse.code);
         assertEquals("我的微信店铺", shopInResponse.getData().getName());
-        assertEquals("我的小店开张", shopInResponse.getData().getDescription());
+        assertEquals("我的小店开张啦", shopInResponse.getData().getDescription());
         assertEquals("http://shopUrl", shopInResponse.getData().getImgUrl());
         assertEquals("ok", shopInResponse.getData().getStatus());
         assertEquals(shopInResponse.getData().getOwnerUserId(), loginResponse.user.getId());
@@ -64,7 +65,7 @@ public class GoodsIntegrationTest extends AbstractIntegrationTest {
 
         assertEquals(SC_CREATED, response.code);
         assertEquals("肥皂", goodsInResponse.getData().getName());
-        assertEquals(shopInResponse.getData().getId(), goodsInResponse.getData().getId());
+        assertEquals(shopInResponse.getData().getId(), goodsInResponse.getData().getShopId());
         assertEquals("ok", goodsInResponse.getData().getStatus());
     }
 

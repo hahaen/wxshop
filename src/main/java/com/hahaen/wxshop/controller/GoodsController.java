@@ -57,7 +57,7 @@ public class GoodsController {
         }
     }
 
-    @DeleteMapping("goods/{id}")
+    @DeleteMapping("/goods/{id}")
     public Response<Goods> deleteGoods(@PathVariable("id") Long goodsId, HttpServletResponse response) {
         try {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);

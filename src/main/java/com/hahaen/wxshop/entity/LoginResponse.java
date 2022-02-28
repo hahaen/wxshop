@@ -1,9 +1,7 @@
 package com.hahaen.wxshop.entity;
 
 import com.hahaen.wxshop.generate.User;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-@SuppressFBWarnings("EI_EXPOSE_REP")
 public class LoginResponse {
     private boolean login;
     private User user;
@@ -19,7 +17,7 @@ public class LoginResponse {
     public LoginResponse() {
     }
 
-    public LoginResponse(boolean login, User user) {
+    private LoginResponse(boolean login, User user) {
         this.login = login;
         this.user = user;
     }

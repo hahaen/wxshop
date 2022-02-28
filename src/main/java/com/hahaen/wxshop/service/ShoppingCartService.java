@@ -7,14 +7,12 @@ import com.hahaen.wxshop.generate.*;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -24,8 +22,9 @@ public class ShoppingCartService {
     private GoodsMapper goodsMapper;
     private SqlSessionFactory sqlSessionFactory;
 
-    @Autowired
-    public ShoppingCartService(ShoppingCartQueryMapper shoppingCartQueryMapper, GoodsMapper goodsMapper, SqlSessionFactory sqlSessionFactory) {
+    public ShoppingCartService(ShoppingCartQueryMapper shoppingCartQueryMapper,
+                               GoodsMapper goodsMapper,
+                               SqlSessionFactory sqlSessionFactory) {
         this.shoppingCartQueryMapper = shoppingCartQueryMapper;
         this.goodsMapper = goodsMapper;
         this.sqlSessionFactory = sqlSessionFactory;
@@ -34,20 +33,18 @@ public class ShoppingCartService {
     public PageResponse<ShoppingCartData> getShoppingCartOfUser(Long userId,
                                                                 int pageNum,
                                                                 int pageSize) {
-        int offect = (pageNum - 1) * pageSize;
-
+        int offset = (pageNum - 1) * pageSize;
         int totalNum = shoppingCartQueryMapper.countHowManyShopsInUserShoppingCart(userId);
-        List<ShoppingCartData> pageData =
-                shoppingCartQueryMapper.selectShoppingCartDataByUserId(userId, pageSize, offect)
-                        .stream()
-                        .collect(groupingBy(shoppingCartData -> shoppingCartData.getShop().getId()))
-                        .values()
-                        .stream().map(this::merge)
-                        .collect(Collectors.toList());
-
+        List<ShoppingCartData> pagedData = shoppingCartQueryMapper.selectShoppingCartDataByUserId(userId, pageSize, offset)
+                .stream()
+                .collect(groupingBy(shoppingCartData -> shoppingCartData.getShop().getId()))
+                .values()
+                .stream()
+                .map(this::merge)
+                .collect(toList());
 
         int totalPage = totalNum % pageSize == 0 ? totalNum / pageSize : totalNum / pageSize + 1;
-        return PageResponse.pagedData(pageNum, pageSize, totalPage, pageData);
+        return PageResponse.pagedData(pageNum, pageSize, totalPage, pagedData);
     }
 
     private ShoppingCartData merge(List<ShoppingCartData> goodsOfSameShop) {
@@ -56,20 +53,20 @@ public class ShoppingCartService {
         List<ShoppingCartGoods> goods = goodsOfSameShop.stream()
                 .map(ShoppingCartData::getGoods)
                 .flatMap(List::stream)
-                .filter(Objects::nonNull)
                 .collect(toList());
         result.setGoods(goods);
         return result;
     }
 
-    public ShoppingCartData addToShoppingCart(ShoppingCartController.AddToShoppingCartRequest request, long userId) {
+    public ShoppingCartData addToShoppingCart(ShoppingCartController.AddToShoppingCartRequest request,
+                                              long userId) {
         List<Long> goodsId = request.getGoods()
                 .stream()
                 .map(ShoppingCartController.AddToShoppingCartItem::getId)
                 .collect(toList());
 
         if (goodsId.isEmpty()) {
-            throw HttpException.badRequest("商品ID为空!");
+            throw HttpException.badRequest("商品ID为空！");
         }
 
         GoodsExample example = new GoodsExample();
@@ -77,7 +74,7 @@ public class ShoppingCartService {
         List<Goods> goods = goodsMapper.selectByExample(example);
 
         if (goods.stream().map(Goods::getShopId).collect(toSet()).size() != 1) {
-            throw HttpException.notFound("商品ID非法!");
+            throw HttpException.badRequest("商品ID非法！");
         }
 
         Map<Long, Goods> idToGoodsMap = goods.stream().collect(toMap(Goods::getId, x -> x));
@@ -97,7 +94,7 @@ public class ShoppingCartService {
         return getLatestShoppingCartDataByUserIdShopId(goods.get(0).getShopId(), userId);
     }
 
-    private ShoppingCartData getLatestShoppingCartDataByUserIdShopId(Long shopId, Long userId) {
+    private ShoppingCartData getLatestShoppingCartDataByUserIdShopId(long shopId, long userId) {
         List<ShoppingCartData> resultRows = shoppingCartQueryMapper.selectShoppingCartDataByUserIdShopId(userId, shopId);
         return merge(resultRows);
     }
@@ -124,10 +121,9 @@ public class ShoppingCartService {
     public ShoppingCartData deleteGoodsInShoppingCart(long goodsId, long userId) {
         Goods goods = goodsMapper.selectByPrimaryKey(goodsId);
         if (goods == null) {
-            throw HttpException.notFound("商品未找到！" + goodsId);
+            throw HttpException.notFound("商品未找到：" + goodsId);
         }
         shoppingCartQueryMapper.deleteShoppingCart(goodsId, userId);
-
-        return getLatestShoppingCartDataByUserIdShopId(goodsId, userId);
+        return getLatestShoppingCartDataByUserIdShopId(goods.getShopId(), userId);
     }
 }

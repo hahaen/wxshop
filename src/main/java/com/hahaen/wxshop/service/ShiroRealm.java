@@ -1,6 +1,5 @@
 package com.hahaen.wxshop.service;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -11,11 +10,11 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service()
 public class ShiroRealm extends AuthorizingRealm {
+
     private final VerificationCodeCheckService verificationCodeCheckService;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     @Autowired
     public ShiroRealm(VerificationCodeCheckService verificationCodeCheckService) {
         this.verificationCodeCheckService = verificationCodeCheckService;

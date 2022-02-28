@@ -1,6 +1,5 @@
 package com.hahaen.wxshop.service;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +9,6 @@ public class AuthService {
     private final VerificationCodeCheckService verificationCodeCheckService;
     private final SmsCodeService smsCodeService;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     @Autowired
     public AuthService(UserService userService,
                        VerificationCodeCheckService verificationCodeCheckService,
@@ -20,7 +18,6 @@ public class AuthService {
         this.smsCodeService = smsCodeService;
     }
 
-    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     public void sendVerificationCode(String tel) {
         userService.createUserIfNotExist(tel);
         String correctCode = smsCodeService.sendSmsCode(tel);
