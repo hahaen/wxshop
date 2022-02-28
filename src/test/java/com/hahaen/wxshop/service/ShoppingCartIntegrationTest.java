@@ -5,10 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 import com.hahaen.wxshop.WxshopApplication;
 import com.hahaen.wxshop.controller.ShoppingCartController;
-import com.hahaen.wxshop.entity.PageResponse;
-import com.hahaen.wxshop.entity.Response;
-import com.hahaen.wxshop.entity.ShoppingCartData;
-import com.hahaen.wxshop.entity.ShoppingCartGoods;
+import com.hahaen.wxshop.entity.*;
 import com.hahaen.wxshop.generate.Goods;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,5 +71,23 @@ public class ShoppingCartIntegrationTest extends AbstractIntegrationTest {
         assertTrue(response.getData().getGoods().stream().allMatch(
                 goods -> goods.getShopId() == 1L
         ));
+    }
+
+    @Test
+    public void canDeleteShoppingCartData() throws Exception {
+        UserLoginResponse loginResponse = loginAndGetCookie();
+
+        Response<ShoppingCartData> response = doHttpRequest("/api/v1/shoppingCart/5",
+                "DELETE", null, loginResponse.cookie).asJsonObject(new TypeReference<Response<ShoppingCartData>>() {
+        });
+
+        assertEquals(2L, response.getData().getShop().getId());
+
+        assertEquals(1, response.getData().getGoods().size());
+        ShoppingCartGoods goods = response.getData().getGoods().get(0);
+
+        assertEquals(4L, goods.getId());
+        assertEquals(200, goods.getNumber());
+        assertEquals(DataStatus.OK.toString().toLowerCase(), goods.getStatus());
     }
 }
