@@ -1,6 +1,6 @@
 package com.hahaen.wxshop.controller;
 
-import com.hahaen.wxshop.entity.HttpException;
+import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.wxshop.entity.Response;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

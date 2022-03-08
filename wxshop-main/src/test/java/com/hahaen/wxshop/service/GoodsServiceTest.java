@@ -1,8 +1,8 @@
 package com.hahaen.wxshop.service;
 
 import com.hahaen.api.DataStatus;
-import com.hahaen.wxshop.entity.HttpException;
-import com.hahaen.wxshop.entity.PageResponse;
+import com.hahaen.api.exceptions.HttpException;
+import com.hahaen.api.data.PageResponse;
 import com.hahaen.wxshop.generate.Goods;
 import com.hahaen.wxshop.generate.GoodsMapper;
 import com.hahaen.wxshop.generate.Shop;

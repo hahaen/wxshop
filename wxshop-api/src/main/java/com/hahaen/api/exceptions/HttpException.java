@@ -1,4 +1,4 @@
-package com.hahaen.wxshop.entity;
+package com.hahaen.api.exceptions;
 
 import org.springframework.http.HttpStatus;
 

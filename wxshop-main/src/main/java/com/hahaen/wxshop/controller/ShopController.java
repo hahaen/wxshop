@@ -1,6 +1,6 @@
 package com.hahaen.wxshop.controller;
 
-import com.hahaen.wxshop.entity.PageResponse;
+import com.hahaen.api.data.PageResponse;
 import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.generate.Shop;
 import com.hahaen.wxshop.service.ShopService;

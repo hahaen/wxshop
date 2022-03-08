@@ -1,15 +1,15 @@
 package com.hahaen.wxshop.controller;
 
+import com.hahaen.api.DataStatus;
 import com.hahaen.api.data.OrderInfo;
+import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.wxshop.entity.OrderResponse;
+import com.hahaen.api.data.PageResponse;
 import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.service.OrderService;
 import com.hahaen.wxshop.service.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -21,7 +21,14 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    public void getOrder() {
+    @GetMapping("/order")
+    public PageResponse<OrderResponse> getOrder(@RequestParam("pageNum") Integer pageNum,
+                                                @RequestParam("pageSize") Integer pageSize,
+                                                @RequestParam(value = "status", required = false) String status) {
+        if (status != null && DataStatus.fromStatus(status) == null) {
+            throw HttpException.badRequest("非法status: " + status);
+        }
+        return orderService.getOrder(pageNum, pageSize, DataStatus.fromStatus(status));
     }
 
     /**
@@ -37,6 +44,8 @@ public class OrderController {
     public void updateOrder() {
     }
 
-    public void deleteOrder() {
+    @DeleteMapping("/order/{id}")
+    public Response<OrderResponse> deleteOrder(@PathVariable("id") long orderId) {
+        return Response.of(orderService.deleteOrder(orderId, UserContext.getCurrentUser().getId()));
     }
 }
