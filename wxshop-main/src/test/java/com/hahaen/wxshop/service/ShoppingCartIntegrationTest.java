@@ -5,7 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 import com.hahaen.wxshop.WxshopApplication;
 import com.hahaen.wxshop.controller.ShoppingCartController;
-import com.hahaen.wxshop.entity.*;
+import com.hahaen.api.DataStatus;
+import com.hahaen.wxshop.entity.PageResponse;
+import com.hahaen.wxshop.entity.Response;
+import com.hahaen.wxshop.entity.ShoppingCartData;
+import com.hahaen.wxshop.entity.GoodsWithNumber;
 import com.hahaen.wxshop.generate.Goods;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = WxshopApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"spring.config.location=classpath:test-application.yml"})
+
 public class ShoppingCartIntegrationTest extends AbstractIntegrationTest {
     @Test
     public void canQueryShoppingCartData() throws JsonProcessingException {
@@ -39,10 +44,10 @@ public class ShoppingCartIntegrationTest extends AbstractIntegrationTest {
                         .map(Goods::getId).collect(Collectors.toList()));
         Assertions.assertEquals(Arrays.asList(100L, 200L),
                 response.getData().get(0).getGoods().stream()
-                        .map(ShoppingCartGoods::getPrice).collect(Collectors.toList()));
+                        .map(GoodsWithNumber::getPrice).collect(Collectors.toList()));
         Assertions.assertEquals(Arrays.asList(200, 300),
                 response.getData().get(0).getGoods().stream()
-                        .map(ShoppingCartGoods::getNumber).collect(Collectors.toList()));
+                        .map(GoodsWithNumber::getNumber).collect(Collectors.toList()));
     }
 
     @Test
@@ -64,7 +69,7 @@ public class ShoppingCartIntegrationTest extends AbstractIntegrationTest {
         Assertions.assertEquals(Arrays.asList(1L, 2L),
                 response.getData().getGoods().stream().map(Goods::getId).collect(Collectors.toList()));
         Assertions.assertEquals(Sets.newHashSet(2, 100),
-                response.getData().getGoods().stream().map(ShoppingCartGoods::getNumber).collect(Collectors.toSet()));
+                response.getData().getGoods().stream().map(GoodsWithNumber::getNumber).collect(Collectors.toSet()));
         Assertions.assertTrue(response.getData().getGoods().stream().allMatch(
                 goods -> goods.getShopId() == 1L
         ));
@@ -81,7 +86,7 @@ public class ShoppingCartIntegrationTest extends AbstractIntegrationTest {
         Assertions.assertEquals(2L, response.getData().getShop().getId());
 
         Assertions.assertEquals(1, response.getData().getGoods().size());
-        ShoppingCartGoods goods = response.getData().getGoods().get(0);
+        GoodsWithNumber goods = response.getData().getGoods().get(0);
 
         Assertions.assertEquals(4L, goods.getId());
         Assertions.assertEquals(200, goods.getNumber());

@@ -36,7 +36,7 @@ public class AuthIntegrationTest extends AbstractIntegrationTest {
         doHttpRequest("/api/v1/logout", "POST", null, sessionId);
 
         // 再次带着Cookie访问/api/v1/status 恢复成为未登录状态
-        statusResponse = doHttpRequest("/api/v1/status", "GET", null, sessionId).body;
+        statusResponse = doHttpRequest("/api/v1/status", "GET", null, null).body;
 
         response = objectMapper.readValue(statusResponse, LoginResponse.class);
         Assertions.assertFalse(response.isLogin());

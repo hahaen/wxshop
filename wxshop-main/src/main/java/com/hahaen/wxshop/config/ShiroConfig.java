@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -22,17 +24,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.util.Arrays;
 
 @Configuration
+@EnableTransactionManagement
 public class ShiroConfig implements WebMvcConfigurer {
     @Autowired
     UserService userService;
-
-    @Autowired
-    public ShiroConfig(UserService userService) {
-        this.userService = userService;
-    }
 
     @Value("${wxshop.redis.host}")
     String redisHost;
@@ -76,6 +75,11 @@ public class ShiroConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+
+    @Bean
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
@@ -106,4 +110,5 @@ public class ShiroConfig implements WebMvcConfigurer {
     public ShiroRealm myShiroRealm(VerificationCodeCheckService verificationCodeCheckService) {
         return new ShiroRealm(verificationCodeCheckService);
     }
+
 }

@@ -6,14 +6,25 @@ import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.entity.ShoppingCartData;
 import com.hahaen.wxshop.service.ShoppingCartService;
 import com.hahaen.wxshop.service.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
 public class ShoppingCartController {
+    private static Logger logger = LoggerFactory.getLogger(ShoppingCartController.class);
+
     private final ShoppingCartService shoppingCartService;
 
     @Autowired
@@ -21,6 +32,12 @@ public class ShoppingCartController {
         this.shoppingCartService = shoppingCartService;
     }
 
+    /**
+     * @param pageNum  页码
+     * @param pageSize 每页元素数量
+     * @return 结果
+     */
+    // @formatter:on
     @GetMapping("/shoppingCart")
     public PageResponse<ShoppingCartData> getShoppingCart(
             @RequestParam("pageNum") int pageNum,
@@ -31,6 +48,10 @@ public class ShoppingCartController {
                 pageSize);
     }
 
+    /**
+     * @param request 加购物车请求
+     * @return 添加后的结果
+     */
     @PostMapping("/shoppingCart")
     public Response<ShoppingCartData> addToShoppingCart(@RequestBody AddToShoppingCartRequest request) {
         try {
@@ -39,6 +60,7 @@ public class ShoppingCartController {
             return Response.of(e.getMessage(), null);
         }
     }
+
 
     public static class AddToShoppingCartRequest {
         List<AddToShoppingCartItem> goods;
@@ -73,6 +95,10 @@ public class ShoppingCartController {
         }
     }
 
+    /**
+     * @param goodsId 要删除的商品id
+     * @return 更新后的该店铺数据
+     */
     @DeleteMapping("/shoppingCart/{id}")
     public Response<ShoppingCartData> deleteGoodsInShoppingCart(@PathVariable("id") Long goodsId) {
         try {

@@ -23,4 +23,5 @@ public interface ShoppingCartQueryMapper {
 
     void deleteShoppingCart(@Param("goodsId") long goodsId,
                             @Param("userId") long userId);
+
 }

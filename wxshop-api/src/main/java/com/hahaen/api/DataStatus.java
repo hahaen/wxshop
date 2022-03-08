@@ -1,8 +1,13 @@
-package com.hahaen.wxshop.entity;
+package com.hahaen.api;
 
 public enum DataStatus {
     OK(),
-    DELETED();
+    DELETED(),
+
+    PENDING(),
+    PAID(),
+    DELIVERED(),
+    RECEIVED();
 
     public String getName() {
         return name().toLowerCase();

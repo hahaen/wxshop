@@ -1,13 +1,20 @@
 package com.hahaen.wxshop.service;
 
-import com.hahaen.wxshop.entity.DataStatus;
+import com.hahaen.api.DataStatus;
 import com.hahaen.wxshop.entity.HttpException;
 import com.hahaen.wxshop.entity.PageResponse;
-import com.hahaen.wxshop.generate.*;
+import com.hahaen.wxshop.generate.Goods;
+import com.hahaen.wxshop.generate.GoodsExample;
+import com.hahaen.wxshop.generate.GoodsMapper;
+import com.hahaen.wxshop.generate.Shop;
+import com.hahaen.wxshop.generate.ShopMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class GoodsService {
@@ -17,6 +24,13 @@ public class GoodsService {
     public GoodsService(GoodsMapper goodsMapper, ShopMapper shopMapper) {
         this.goodsMapper = goodsMapper;
         this.shopMapper = shopMapper;
+    }
+
+    public Map<Long, Goods> getIdToGoodsMap(List<Long> goodsId) {
+        GoodsExample example = new GoodsExample();
+        example.createCriteria().andIdIn(goodsId);
+        List<Goods> goods = goodsMapper.selectByExample(example);
+        return goods.stream().collect(toMap(Goods::getId, x -> x));
     }
 
     public Goods createGoods(Goods goods) {
@@ -66,6 +80,9 @@ public class GoodsService {
     }
 
     public PageResponse<Goods> getGoods(Integer pageNum, Integer pageSize, Integer shopId) {
+        // 知道有多少个元素
+        // 然后才知道有多少页
+        // 然后正确地进行分页
 
         int totalNumber = countGoods(shopId);
         int totalPage = totalNumber % pageSize == 0 ? totalNumber / pageSize : totalNumber / pageSize + 1;

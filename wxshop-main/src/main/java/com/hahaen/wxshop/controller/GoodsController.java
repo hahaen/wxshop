@@ -6,7 +6,15 @@ import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.generate.Goods;
 import com.hahaen.wxshop.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -21,6 +29,12 @@ public class GoodsController {
         this.goodsService = goodsService;
     }
 
+    /**
+     * @param pageNum
+     * @param pageSize
+     * @param shopId
+     * @return 查询到的结果
+     */
     @GetMapping("/goods")
     public @ResponseBody
     PageResponse<Goods> getGoods(@RequestParam("pageNum") Integer pageNum,
@@ -29,7 +43,11 @@ public class GoodsController {
         return goodsService.getGoods(pageNum, pageSize, shopId);
     }
 
-
+    /**
+     * @param goods    goods to be created
+     * @param response the HTTP response
+     * @return the newly created goods
+     */
     @PostMapping("/goods")
     public Response<Goods> createdGoods(@RequestBody Goods goods, HttpServletResponse response) {
         clean(goods);
@@ -48,6 +66,11 @@ public class GoodsController {
         goods.setUpdatedAt(new Date());
     }
 
+    /**
+     * @param goods
+     * @param response
+     * @return 更新后的结果
+     */
     public Response<Goods> updateGoods(Goods goods, HttpServletResponse response) {
         try {
             return Response.of(goodsService.updateGoods(goods));
@@ -57,6 +80,11 @@ public class GoodsController {
         }
     }
 
+    /**
+     * @param goodsId  the goods id to be deleted
+     * @param response the HTTP response
+     * @return the deleted goods
+     */
     @DeleteMapping("/goods/{id}")
     public Response<Goods> deleteGoods(@PathVariable("id") Long goodsId, HttpServletResponse response) {
         try {

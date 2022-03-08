@@ -1,9 +1,13 @@
 package com.hahaen.wxshop.service;
 
-import com.hahaen.wxshop.entity.DataStatus;
+import com.hahaen.api.DataStatus;
 import com.hahaen.wxshop.entity.HttpException;
 import com.hahaen.wxshop.entity.PageResponse;
-import com.hahaen.wxshop.generate.*;
+import com.hahaen.wxshop.generate.Goods;
+import com.hahaen.wxshop.generate.GoodsMapper;
+import com.hahaen.wxshop.generate.Shop;
+import com.hahaen.wxshop.generate.ShopMapper;
+import com.hahaen.wxshop.generate.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +21,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GoodsServiceTest {

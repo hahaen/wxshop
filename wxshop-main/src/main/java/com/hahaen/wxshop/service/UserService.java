@@ -29,12 +29,6 @@ public class UserService {
         return new User();
     }
 
-    /**
-     * 根据电话返回用户，如果用户不存在,返回null
-     *
-     * @param tel
-     * @return 返回用户
-     */
     public Optional<User> getUserByTel(String tel) {
         return Optional.ofNullable(userDao.getUserByTel(tel));
     }
