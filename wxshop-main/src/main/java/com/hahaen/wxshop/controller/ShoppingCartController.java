@@ -1,6 +1,5 @@
 package com.hahaen.wxshop.controller;
 
-import com.hahaen.wxshop.entity.HttpException;
 import com.hahaen.wxshop.entity.PageResponse;
 import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.entity.ShoppingCartData;
@@ -9,14 +8,7 @@ import com.hahaen.wxshop.service.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,11 +46,7 @@ public class ShoppingCartController {
      */
     @PostMapping("/shoppingCart")
     public Response<ShoppingCartData> addToShoppingCart(@RequestBody AddToShoppingCartRequest request) {
-        try {
-            return Response.of(shoppingCartService.addToShoppingCart(request, UserContext.getCurrentUser().getId()));
-        } catch (HttpException e) {
-            return Response.of(e.getMessage(), null);
-        }
+        return Response.of(shoppingCartService.addToShoppingCart(request, UserContext.getCurrentUser().getId()));
     }
 
 
@@ -101,10 +89,6 @@ public class ShoppingCartController {
      */
     @DeleteMapping("/shoppingCart/{id}")
     public Response<ShoppingCartData> deleteGoodsInShoppingCart(@PathVariable("id") Long goodsId) {
-        try {
-            return Response.of(shoppingCartService.deleteGoodsInShoppingCart(goodsId, UserContext.getCurrentUser().getId()));
-        } catch (HttpException e) {
-            return Response.of(e.getMessage(), null);
-        }
+        return Response.of(shoppingCartService.deleteGoodsInShoppingCart(goodsId, UserContext.getCurrentUser().getId()));
     }
 }

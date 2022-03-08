@@ -1,20 +1,11 @@
 package com.hahaen.wxshop.controller;
 
-import com.hahaen.wxshop.entity.HttpException;
 import com.hahaen.wxshop.entity.PageResponse;
 import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.generate.Goods;
 import com.hahaen.wxshop.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -52,12 +43,7 @@ public class GoodsController {
     public Response<Goods> createdGoods(@RequestBody Goods goods, HttpServletResponse response) {
         clean(goods);
         response.setStatus(HttpServletResponse.SC_CREATED);
-        try {
-            return Response.of(goodsService.createGoods(goods));
-        } catch (HttpException e) {
-            response.setStatus(e.getStatusCode());
-            return Response.of(e.getMessage(), null);
-        }
+        return Response.of(goodsService.createGoods(goods));
     }
 
     private void clean(Goods goods) {
@@ -68,16 +54,10 @@ public class GoodsController {
 
     /**
      * @param goods
-     * @param response
      * @return 更新后的结果
      */
-    public Response<Goods> updateGoods(Goods goods, HttpServletResponse response) {
-        try {
-            return Response.of(goodsService.updateGoods(goods));
-        } catch (HttpException e) {
-            response.setStatus(e.getStatusCode());
-            return Response.of(e.getMessage(), null);
-        }
+    public Response<Goods> updateGoods(Goods goods) {
+        return Response.of(goodsService.updateGoods(goods));
     }
 
     /**
@@ -87,12 +67,7 @@ public class GoodsController {
      */
     @DeleteMapping("/goods/{id}")
     public Response<Goods> deleteGoods(@PathVariable("id") Long goodsId, HttpServletResponse response) {
-        try {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            return Response.of(goodsService.deleteGoodsById(goodsId));
-        } catch (HttpException e) {
-            response.setStatus(e.getStatusCode());
-            return Response.of(e.getMessage(), null);
-        }
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        return Response.of(goodsService.deleteGoodsById(goodsId));
     }
 }
