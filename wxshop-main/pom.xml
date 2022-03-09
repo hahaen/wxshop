@@ -93,7 +93,6 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>6.3.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -108,15 +107,15 @@
         </dependency>
 
         <!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-classic</artifactId>-->
-<!--            <version>1.2.3</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-core</artifactId>-->
-<!--            <version>1.2.3</version>-->
-<!--        </dependency>-->
+        <!--            <groupId>ch.qos.logback</groupId>-->
+        <!--            <artifactId>logback-classic</artifactId>-->
+        <!--            <version>1.2.3</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>ch.qos.logback</groupId>-->
+        <!--            <artifactId>logback-core</artifactId>-->
+        <!--            <version>1.2.3</version>-->
+        <!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -228,9 +227,9 @@
                     </execution>
                     <execution>
                         <id>default-check</id>
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
+                        <!--                        <goals>-->
+                        <!--                            <goal>check</goal>-->
+                        <!--                        </goals>-->
                         <configuration>
                             <rules>
                                 <rule>

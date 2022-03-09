@@ -6,17 +6,17 @@
         values
         <foreach item="item" collection="goods"
                  separator=",">
-            (#{item.id}, #{id}, #{item.number})
+            (#{item.id}, #{orderId}, #{item.number})
         </foreach>
     </insert>
     <select id="getGoodsInfoOfOrder" parameterType="long" resultType="GoodsInfo">
-        select GOODS_ID as id,
+        SELECT GOODS_ID as id,
                NUMBER   as number
-        from ORDER_GOODS
-        where ORDER_ID = #{id}
+        FROM ORDER_GOODS
+        WHERE ORDER_ID = #{id}
     </select>
     <update id="updateById" parameterType="Order">
-        update `ORDER`
+        UPDATE `ORDER`
         SET
         UPDATED_AT = now()
         <if test="expressCompany != null">
@@ -31,7 +31,7 @@
             ,
             STATUS = #{status}
         </if>
-        where
-        ID= #{id}
+        WHERE
+        ID = #{id}
     </update>
 </mapper>

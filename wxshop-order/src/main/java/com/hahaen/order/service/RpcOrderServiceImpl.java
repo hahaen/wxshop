@@ -25,14 +25,18 @@ import static java.util.stream.Collectors.toList;
 
 @Service(version = "${wxshop.orderservice.version}")
 public class RpcOrderServiceImpl implements OrderRpcService {
-    @Autowired
     private OrderMapper orderMapper;
 
-    @Autowired
     private MyOrderMapper myOrderMapper;
 
-    @Autowired
     private OrderGoodsMapper orderGoodsMapper;
+
+    @Autowired
+    public RpcOrderServiceImpl(OrderMapper orderMapper, MyOrderMapper myOrderMapper, OrderGoodsMapper orderGoodsMapper) {
+        this.orderMapper = orderMapper;
+        this.myOrderMapper = myOrderMapper;
+        this.orderGoodsMapper = orderGoodsMapper;
+    }
 
     @Override
     public Order createOrder(OrderInfo orderInfo, Order order) {
@@ -98,7 +102,7 @@ public class RpcOrderServiceImpl implements OrderRpcService {
 
         Map<Long, List<OrderGoods>> orderIdToGoodsMap = orderGoods
                 .stream()
-                .collect(Collectors.groupingBy(OrderGoods::getGoodsId, toList()));
+                .collect(Collectors.groupingBy(OrderGoods::getOrderId, toList()));
 
         List<RpcOrderGoods> rpcOrderGoods = orders
                 .stream()
@@ -141,7 +145,7 @@ public class RpcOrderServiceImpl implements OrderRpcService {
     }
 
     private OrderExample.Criteria setStatus(OrderExample orderExample, DataStatus status) {
-        if (status != null) {
+        if (status == null) {
             return orderExample.createCriteria().andStatusNotEqualTo(DELETED.getName());
         } else {
             return orderExample.createCriteria().andStatusNotEqualTo(status.getName());
@@ -160,8 +164,7 @@ public class RpcOrderServiceImpl implements OrderRpcService {
         order.setCreatedAt(new Date());
         order.setUpdatedAt(new Date());
 
-        long id = orderMapper.insert(order);
-        order.setId(id);
+        orderMapper.insert(order);
     }
 
     private void verify(BooleanSupplier supplier, String message) {
