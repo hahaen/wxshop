@@ -3,15 +3,16 @@ package com.hahaen.wxshop.service;
 import com.hahaen.api.DataStatus;
 import com.hahaen.api.data.GoodsInfo;
 import com.hahaen.api.data.OrderInfo;
+import com.hahaen.api.data.PageResponse;
 import com.hahaen.api.data.RpcOrderGoods;
+import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.api.generate.Order;
 import com.hahaen.api.rpc.OrderRpcService;
 import com.hahaen.wxshop.dao.GoodsStockMapper;
 import com.hahaen.wxshop.entity.GoodsWithNumber;
-import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.wxshop.entity.OrderResponse;
-import com.hahaen.api.data.PageResponse;
 import com.hahaen.wxshop.generate.Goods;
+import com.hahaen.wxshop.generate.Shop;
 import com.hahaen.wxshop.generate.ShopMapper;
 import com.hahaen.wxshop.generate.UserMapper;
 import org.apache.dubbo.config.annotation.Reference;
@@ -132,9 +133,14 @@ public class OrderService {
 
 
     public OrderResponse deleteOrder(long orderId, long userId) {
-        RpcOrderGoods rpcOrderGoods = orderRpcService.deleteOrder(orderId, userId);
+        return toOrderResponse(orderRpcService.deleteOrder(orderId, userId));
+
+    }
+
+    private OrderResponse toOrderResponse(RpcOrderGoods rpcOrderGoods) {
         Map<Long, Goods> idToGoodsMap = getIdToGoodsMap(rpcOrderGoods.getGoods());
         return generateResponse(rpcOrderGoods.getOrder(), idToGoodsMap, rpcOrderGoods.getGoods());
+
     }
 
     public PageResponse<OrderResponse> getOrder(long userId,
@@ -162,5 +168,42 @@ public class OrderService {
                 rpcOrderGoods.getTotalPage(),
                 orders
         );
+    }
+
+    public OrderResponse updateExpressInformation(Order order, long userId) {
+        Order orderInDatabase = orderRpcService.getOrderById(order.getId());
+        if (orderInDatabase == null) {
+            throw HttpException.notFound("订单未找到: " + order.getId());
+        }
+
+        Shop shop = shopMapper.selectByPrimaryKey(orderInDatabase.getShopId());
+        if (shop == null) {
+            throw HttpException.notFound("店铺未找到: " + orderInDatabase.getShopId());
+        }
+
+        if (shop.getOwnerUserId() != userId) {
+            throw HttpException.forbidden("无权访问！");
+        }
+
+        Order copy = new Order();
+        copy.setId(order.getId());
+        copy.setExpressId(order.getExpressId());
+        copy.setExpressCompany(order.getExpressCompany());
+        return toOrderResponse(orderRpcService.updateOrder(copy));
+    }
+
+    public OrderResponse updateOrderStatus(Order order, long userId) {
+        Order orderInDatabase = orderRpcService.getOrderById(order.getId());
+        if (orderInDatabase == null) {
+            throw HttpException.notFound("订单未找到: " + order.getId());
+        }
+
+        if (orderInDatabase.getUserId() != userId) {
+            throw HttpException.forbidden("无权访问！");
+        }
+
+        Order copy = new Order();
+        copy.setStatus(order.getStatus());
+        return toOrderResponse(orderRpcService.updateOrder(copy));
     }
 }

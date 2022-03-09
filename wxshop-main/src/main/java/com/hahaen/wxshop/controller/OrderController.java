@@ -2,9 +2,10 @@ package com.hahaen.wxshop.controller;
 
 import com.hahaen.api.DataStatus;
 import com.hahaen.api.data.OrderInfo;
-import com.hahaen.api.exceptions.HttpException;
-import com.hahaen.wxshop.entity.OrderResponse;
 import com.hahaen.api.data.PageResponse;
+import com.hahaen.api.exceptions.HttpException;
+import com.hahaen.api.generate.Order;
+import com.hahaen.wxshop.entity.OrderResponse;
 import com.hahaen.wxshop.entity.Response;
 import com.hahaen.wxshop.service.OrderService;
 import com.hahaen.wxshop.service.UserContext;
@@ -28,7 +29,7 @@ public class OrderController {
         if (status != null && DataStatus.fromStatus(status) == null) {
             throw HttpException.badRequest("非法status: " + status);
         }
-        return orderService.getOrder(pageNum, pageSize, DataStatus.fromStatus(status));
+        return orderService.getOrder(UserContext.getCurrentUser().getId(), pageNum, pageSize, DataStatus.fromStatus(status));
     }
 
     /**
@@ -41,7 +42,13 @@ public class OrderController {
         return Response.of(orderService.createOrder(orderInfo, UserContext.getCurrentUser().getId()));
     }
 
-    public void updateOrder() {
+    @RequestMapping(value = "/order/{id}", method = {RequestMethod.POST, RequestMethod.PATCH})
+    public Response<OrderResponse> updateOrder(@PathVariable("id") Integer id, @RequestBody Order order) {
+        if (order.getExpressCompany() != null) {
+            return Response.of(orderService.updateExpressInformation(order, UserContext.getCurrentUser().getId()));
+        } else {
+            return Response.of(orderService.updateOrderStatus(order, UserContext.getCurrentUser().getId()));
+        }
     }
 
     @DeleteMapping("/order/{id}")

@@ -43,6 +43,11 @@ public class RpcOrderServiceImpl implements OrderRpcService {
     }
 
     @Override
+    public Order getOrderById(long orderId) {
+        return orderMapper.selectByPrimaryKey(orderId);
+    }
+
+    @Override
     public RpcOrderGoods deleteOrder(long orderId, long userId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if (order == null) {
@@ -103,6 +108,17 @@ public class RpcOrderServiceImpl implements OrderRpcService {
                 pageSize,
                 totalPage,
                 rpcOrderGoods);
+    }
+
+    @Override
+    public RpcOrderGoods updateOrder(Order order) {
+        orderMapper.updateByPrimaryKey(order);
+
+        List<GoodsInfo> goodsInfo = myOrderMapper.getGoodsInfoOfOrder(order.getId());
+        RpcOrderGoods result = new RpcOrderGoods();
+        result.setGoods(goodsInfo);
+        result.setOrder(orderMapper.selectByPrimaryKey(order.getId()));
+        return result;
     }
 
     private RpcOrderGoods toRpcOrderGoods(Order order, Map<Long, List<OrderGoods>> orderIdToGoodsMap) {

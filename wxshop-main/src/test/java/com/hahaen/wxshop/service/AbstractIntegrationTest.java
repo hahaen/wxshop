@@ -104,10 +104,26 @@ public class AbstractIntegrationTest {
             T result = objectMapper.readValue(body, typeReference);
             return result;
         }
+
+        public HttpResponse assertOkStatusCode() {
+            Assertions.assertTrue(code >= 200 && code < 300);
+            return this;
+        }
+    }
+
+    private HttpRequest createRequest(String url, String method) {
+        if ("PATCH".equalsIgnoreCase(method)) {
+
+            HttpRequest request = new HttpRequest(url, "POST");
+            request.header("X-HTTP-Method-Override", "PATCH");
+            return request;
+        } else {
+            return new HttpRequest(url, method);
+        }
     }
 
     public HttpResponse doHttpRequest(String apiName, String httpMethod, Object requestBody, String cookie) throws JsonProcessingException {
-        HttpRequest request = new HttpRequest(getUrl(apiName), httpMethod);
+        HttpRequest request = createRequest(getUrl(apiName), httpMethod);
         if (cookie != null) {
             request.header("Cookie", cookie);
         }
