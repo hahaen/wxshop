@@ -18,6 +18,18 @@ docker run -d -p 3307:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wxshop 
 winpty docker exec -it 9734ef38 mysql -uroot -proot -e 'create database if not exists `order`'
 ```
 
+* redis
+
+```
+docker run -p 6379:6379 -d redis
+```
+
+* zookeeper
+
+```
+docker run -p 2181:2181 -d zookeeper
+```
+
 * Flyway
 
 ```
@@ -48,4 +60,47 @@ mvn clean verify
 
 ```
 mvn install -DskipTest
+```
+
+* apidoc
+
+```
+apidoc -i wxshop-main/src/main/java/com/hahaen/wxshop/controller -o doc
+```
+
+* nginx
+
+```
+events{}
+http {
+    include    mime.types;
+    upstream app {
+        server xxx:8080;
+        server xxx:8081;
+    }
+    server{
+        location /api {
+            proxy_pass http://app;
+            proxy_cookie_path / "/; httponly; secure; SameSite=None";
+        }
+        location / {
+            root   /static;
+            autoindex on;
+        }
+     }
+}
+```
+
+```
+./mvnw install -DskipTests
+```
+
+```
+tmux new -s 0
+tmux attach -t 0
+```
+
+```
+java -Dserver.port=8082 -jar wxshop-order/target/wxshop-order-0.0.1-SNAPSHOT.jar
+java -jar wxshop-main/target/wxshop-main-0.0.1-SNAPSHOT.jar
 ```
