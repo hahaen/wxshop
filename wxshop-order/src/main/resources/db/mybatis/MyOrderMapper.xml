@@ -18,7 +18,7 @@
     <update id="updateById" parameterType="Order">
         UPDATE `ORDER`
         SET
-        UPDATED_AT = now()
+            UPDATED_AT = now()
         <if test="expressCompany != null">
             ,
             EXPRESS_COMPANY = #{expressCompany}
@@ -32,6 +32,6 @@
             STATUS = #{status}
         </if>
         WHERE
-        ID = #{id}
+            ID = #{id}
     </update>
 </mapper>

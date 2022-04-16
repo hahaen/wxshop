@@ -1,15 +1,16 @@
 package com.hahaen.wxshop.service;
 
 import com.hahaen.api.DataStatus;
+import com.hahaen.api.data.PageResponse;
+import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.wxshop.controller.ShoppingCartController;
 import com.hahaen.wxshop.dao.ShoppingCartQueryMapper;
 import com.hahaen.wxshop.entity.GoodsWithNumber;
-import com.hahaen.api.exceptions.HttpException;
-import com.hahaen.api.data.PageResponse;
 import com.hahaen.wxshop.entity.ShoppingCartData;
 import com.hahaen.wxshop.generate.Goods;
 import com.hahaen.wxshop.generate.GoodsMapper;
 import com.hahaen.wxshop.generate.ShoppingCart;
+import com.hahaen.wxshop.generate.ShoppingCartExample;
 import com.hahaen.wxshop.generate.ShoppingCartMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.ibatis.session.ExecutorType;
@@ -60,6 +61,7 @@ public class ShoppingCartService {
                 .values()
                 .stream()
                 .map(this::merge)
+                .filter(Objects::nonNull)
                 .collect(toList());
 
         int totalPage = totalNum % pageSize == 0 ? totalNum / pageSize : totalNum / pageSize + 1;
@@ -67,6 +69,9 @@ public class ShoppingCartService {
     }
 
     private ShoppingCartData merge(List<ShoppingCartData> goodsOfSameShop) {
+        if (goodsOfSameShop.isEmpty()) {
+            return null;
+        }
         ShoppingCartData result = new ShoppingCartData();
         result.setShop(goodsOfSameShop.get(0).getShop());
         List<GoodsWithNumber> goods = goodsOfSameShop.stream()
@@ -104,11 +109,19 @@ public class ShoppingCartService {
 
         try (SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH)) {
             ShoppingCartMapper mapper = sqlSession.getMapper(ShoppingCartMapper.class);
-            shoppingCartRows.forEach(mapper::insert);
+            shoppingCartRows.forEach(row -> insertGoodsToShoppingCart(userId, row, mapper));
             sqlSession.commit();
         }
 
         return getLatestShoppingCartDataByUserIdShopId(new ArrayList<>(idToGoodsMap.values()).get(0).getShopId(), userId);
+    }
+
+    private void insertGoodsToShoppingCart(long userId, ShoppingCart shoppingCartRow, ShoppingCartMapper shoppingCartMapper) {
+        // 首先删除购物车中已有的相应商品
+        ShoppingCartExample example = new ShoppingCartExample();
+        example.createCriteria().andGoodsIdEqualTo(shoppingCartRow.getGoodsId()).andUserIdEqualTo(userId);
+        shoppingCartMapper.deleteByExample(example);
+        shoppingCartMapper.insert(shoppingCartRow);
     }
 
     private ShoppingCartData getLatestShoppingCartDataByUserIdShopId(long shopId, long userId) {

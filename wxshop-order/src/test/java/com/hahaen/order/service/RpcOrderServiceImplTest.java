@@ -7,8 +7,8 @@ import com.hahaen.api.data.PageResponse;
 import com.hahaen.api.data.RpcOrderGoods;
 import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.api.generate.Order;
-import com.hahaen.api.generate.OrderGoodsMapper;
-import com.hahaen.api.generate.OrderMapper;
+import com.hahaen.order.generate.OrderGoodsMapper;
+import com.hahaen.order.generate.OrderMapper;
 import com.hahaen.order.mapper.MyOrderMapper;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -81,13 +81,22 @@ public class RpcOrderServiceImplTest {
         Assertions.assertNotNull(orderWithId.getId());
 
 
-        Order orderInDB = rpcOrderService.getOrderById(orderWithId.getId());
+        RpcOrderGoods orderInDB = rpcOrderService.getOrderById(orderWithId.getId());
 
-        Assertions.assertEquals(1L, orderInDB.getUserId());
-        Assertions.assertEquals(1L, orderInDB.getShopId());
-        Assertions.assertEquals("火星", orderInDB.getAddress());
-        Assertions.assertEquals(10000L, orderInDB.getTotalPrice());
-        Assertions.assertEquals(DataStatus.PENDING.getName(), orderInDB.getStatus());
+        Assertions.assertEquals(Arrays.asList(1L, 2L),
+                orderInDB.getGoods().stream().map(GoodsInfo::getId).collect(toList()));
+        Assertions.assertEquals(1L, orderInDB.getOrder().getUserId());
+        Assertions.assertEquals(1L, orderInDB.getOrder().getShopId());
+        Assertions.assertEquals("火星", orderInDB.getOrder().getAddress());
+        Assertions.assertEquals(10000L, orderInDB.getOrder().getTotalPrice());
+        Assertions.assertEquals(DataStatus.PENDING.getName(), orderInDB.getOrder().getStatus());
+    }
+
+    @Test
+    public void canGetEmptyOrderList() {
+        PageResponse<RpcOrderGoods> result = rpcOrderService.getOrder(8888L, 2, 1, null);
+        Assertions.assertEquals(0, result.getData().size());
+        Assertions.assertEquals(0, result.getTotalPage());
     }
 
     @Test
@@ -116,7 +125,7 @@ public class RpcOrderServiceImplTest {
 
     @Test
     public void updateOrderTest() {
-        Order order = rpcOrderService.getOrderById(2L);
+        Order order = rpcOrderService.getOrderById(2L).getOrder();
         order.setExpressCompany("中通");
         order.setExpressId("中通12345");
         order.setStatus(DataStatus.DELIVERED.getName());

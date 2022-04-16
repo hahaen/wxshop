@@ -2,7 +2,7 @@ spring:
   application:
     name: wxshop-order
   datasource:
-    url: jdbc:mysql://localhost:3306/order?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/order?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf-8
     username: root
     password: root
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -19,6 +19,6 @@ mybatis:
 
 dubbo:
   registry:
-    address: zookeeper://127.0.0.1:2181
+    address: zookeeper://localhost:2181
   scan:
     base-packages: com.hahaen.order.service

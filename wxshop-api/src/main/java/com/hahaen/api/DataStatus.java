@@ -4,6 +4,7 @@ public enum DataStatus {
     OK(),
     DELETED(),
 
+    // Only for order
     PENDING(),
     PAID(),
     DELIVERED(),

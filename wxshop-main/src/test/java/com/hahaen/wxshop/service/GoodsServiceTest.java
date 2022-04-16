@@ -1,8 +1,8 @@
 package com.hahaen.wxshop.service;
 
 import com.hahaen.api.DataStatus;
-import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.api.data.PageResponse;
+import com.hahaen.api.exceptions.HttpException;
 import com.hahaen.wxshop.generate.Goods;
 import com.hahaen.wxshop.generate.GoodsMapper;
 import com.hahaen.wxshop.generate.Shop;
@@ -79,7 +79,6 @@ class GoodsServiceTest {
     public void throwExceptionIfGoodsNotFound() {
         long goodsToBeDeleted = 123;
 
-        when(shop.getOwnerUserId()).thenReturn(1L);
         when(goodsMapper.selectByPrimaryKey(goodsToBeDeleted)).thenReturn(null);
         HttpException thrownException = assertThrows(HttpException.class, () -> {
             goodsService.deleteGoodsById(goodsToBeDeleted);
@@ -93,6 +92,7 @@ class GoodsServiceTest {
         long goodsToBeDeleted = 123;
 
         when(shop.getOwnerUserId()).thenReturn(2L);
+        when(goodsMapper.selectByPrimaryKey(goodsToBeDeleted)).thenReturn(goods);
         HttpException thrownException = assertThrows(HttpException.class, () -> {
             goodsService.deleteGoodsById(goodsToBeDeleted);
         });
@@ -108,7 +108,7 @@ class GoodsServiceTest {
         when(goodsMapper.selectByPrimaryKey(goodsToBeDeleted)).thenReturn(goods);
         goodsService.deleteGoodsById(goodsToBeDeleted);
 
-        verify(goods).setStatus(DataStatus.DELETED.getName());
+        Mockito.verify(goods).setStatus(DataStatus.DELETED.getName());
     }
 
     @Test
@@ -137,18 +137,11 @@ class GoodsServiceTest {
 
         when(goodsMapper.countByExample(any())).thenReturn(100L);
         when(goodsMapper.selectByExample(any())).thenReturn(mockData);
-        PageResponse<Goods> result = goodsService.getGoods(pageNumber, pageSize, 456);
+        PageResponse<Goods> result = goodsService.getGoods(pageNumber, pageSize, 456L);
 
         assertEquals(10, result.getTotalPage());
         assertEquals(5, result.getPageNum());
         assertEquals(10, result.getPageSize());
         assertEquals(mockData, result.getData());
-    }
-
-    @Test
-    public void updateGoodsSucceed() {
-        when(shop.getOwnerUserId()).thenReturn(1L);
-        when(goodsMapper.updateByExample(any(), any())).thenReturn(1);
-        assertEquals(goods, goodsService.updateGoods(goods));
     }
 }

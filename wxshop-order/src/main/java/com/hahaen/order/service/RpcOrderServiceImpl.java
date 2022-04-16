@@ -6,8 +6,13 @@ import com.hahaen.api.data.OrderInfo;
 import com.hahaen.api.data.PageResponse;
 import com.hahaen.api.data.RpcOrderGoods;
 import com.hahaen.api.exceptions.HttpException;
-import com.hahaen.api.generate.*;
+import com.hahaen.api.generate.Order;
+import com.hahaen.api.generate.OrderExample;
+import com.hahaen.api.generate.OrderGoods;
+import com.hahaen.api.generate.OrderGoodsExample;
 import com.hahaen.api.rpc.OrderRpcService;
+import com.hahaen.order.generate.OrderGoodsMapper;
+import com.hahaen.order.generate.OrderMapper;
 import com.hahaen.order.mapper.MyOrderMapper;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,15 +52,23 @@ public class RpcOrderServiceImpl implements OrderRpcService {
     }
 
     @Override
-    public Order getOrderById(long orderId) {
-        return orderMapper.selectByPrimaryKey(orderId);
+    public RpcOrderGoods getOrderById(long orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            return null;
+        }
+        List<GoodsInfo> goodsInfo = myOrderMapper.getGoodsInfoOfOrder(orderId);
+        RpcOrderGoods result = new RpcOrderGoods();
+        result.setGoods(goodsInfo);
+        result.setOrder(order);
+        return result;
     }
 
     @Override
     public RpcOrderGoods deleteOrder(long orderId, long userId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if (order == null) {
-            throw HttpException.notFound("订单未找到：" + orderId);
+            throw HttpException.notFound("订单未找到: " + orderId);
         }
         if (order.getUserId() != userId) {
             throw HttpException.forbidden("无权访问！");
@@ -66,6 +79,7 @@ public class RpcOrderServiceImpl implements OrderRpcService {
         order.setStatus(DELETED.getName());
         order.setUpdatedAt(new Date());
         orderMapper.updateByPrimaryKey(order);
+
         RpcOrderGoods result = new RpcOrderGoods();
         result.setGoods(goodsInfo);
         result.setOrder(order);
@@ -78,25 +92,16 @@ public class RpcOrderServiceImpl implements OrderRpcService {
                                                 Integer pageSize,
                                                 DataStatus status) {
         OrderExample countByStatus = new OrderExample();
-
-        setStatus(countByStatus, status);
+        setStatus(countByStatus, status).andUserIdEqualTo(userId);
         int count = (int) orderMapper.countByExample(countByStatus);
 
-        OrderExample pageOrder = new OrderExample();
-        pageOrder.setOffset((pageNum - 1) * pageSize);
-        pageOrder.setLimit(pageNum);
-        setStatus(pageOrder, status).andUserIdEqualTo(userId);
+        OrderExample pagedOrder = new OrderExample();
+        pagedOrder.setOffset((pageNum - 1) * pageSize);
+        pagedOrder.setLimit(pageNum);
+        setStatus(pagedOrder, status).andUserIdEqualTo(userId);
 
-        List<Order> orders = orderMapper.selectByExample(pageOrder);
-
-        List<Long> ordersIds = orders
-                .stream()
-                .map(Order::getId)
-                .collect(toList());
-
-        OrderGoodsExample selectByOrderIds = new OrderGoodsExample();
-        selectByOrderIds.createCriteria().andOrderIdIn(ordersIds);
-        List<OrderGoods> orderGoods = orderGoodsMapper.selectByExample(selectByOrderIds);
+        List<Order> orders = orderMapper.selectByExample(pagedOrder);
+        List<OrderGoods> orderGoods = getOrderGoods(orders);
 
         int totalPage = count % pageSize == 0 ? count / pageSize : count / pageSize + 1;
 
@@ -104,14 +109,26 @@ public class RpcOrderServiceImpl implements OrderRpcService {
                 .stream()
                 .collect(Collectors.groupingBy(OrderGoods::getOrderId, toList()));
 
-        List<RpcOrderGoods> rpcOrderGoods = orders
-                .stream()
+        List<RpcOrderGoods> rpcOrderGoods = orders.stream()
                 .map(order -> toRpcOrderGoods(order, orderIdToGoodsMap))
                 .collect(toList());
+
         return PageResponse.pagedData(pageNum,
                 pageSize,
                 totalPage,
                 rpcOrderGoods);
+    }
+
+    private List<OrderGoods> getOrderGoods(List<Order> orders) {
+        if (orders.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> orderIds = orders.stream().map(Order::getId).collect(toList());
+
+        OrderGoodsExample selectByOrderIds = new OrderGoodsExample();
+        selectByOrderIds.createCriteria().andOrderIdIn(orderIds);
+        return orderGoodsMapper.selectByExample(selectByOrderIds);
     }
 
     @Override
@@ -148,7 +165,7 @@ public class RpcOrderServiceImpl implements OrderRpcService {
         if (status == null) {
             return orderExample.createCriteria().andStatusNotEqualTo(DELETED.getName());
         } else {
-            return orderExample.createCriteria().andStatusNotEqualTo(status.getName());
+            return orderExample.createCriteria().andStatusEqualTo(status.getName());
         }
     }
 

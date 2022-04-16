@@ -7,6 +7,7 @@ public class GoodsInfo implements Serializable {
     private int number;
 
     public GoodsInfo() {
+
     }
 
     public GoodsInfo(long id, int number) {

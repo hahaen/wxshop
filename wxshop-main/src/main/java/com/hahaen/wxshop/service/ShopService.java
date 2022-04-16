@@ -24,12 +24,17 @@ public class ShopService {
 
     public PageResponse<Shop> getShopByUserId(Long userId, int pageNum, int pageSize) {
         ShopExample countByStatus = new ShopExample();
-        countByStatus.createCriteria().andStatusEqualTo(DataStatus.DELETED.getName());
+        countByStatus.createCriteria()
+                .andStatusEqualTo(DataStatus.OK.getName())
+                .andOwnerUserIdEqualTo(userId);
         int totalNumber = (int) shopMapper.countByExample(countByStatus);
         int totalPage = totalNumber % pageSize == 0 ? totalNumber / pageSize : totalNumber / pageSize + 1;
 
         ShopExample pageCondition = new ShopExample();
-        pageCondition.createCriteria().andStatusEqualTo(DataStatus.OK.getName());
+        pageCondition.setOrderByClause("updated_at desc");
+        pageCondition.createCriteria()
+                .andStatusEqualTo(DataStatus.OK.getName())
+                .andOwnerUserIdEqualTo(userId);
         pageCondition.setLimit(pageSize);
         pageCondition.setOffset((pageNum - 1) * pageSize);
 
@@ -78,5 +83,17 @@ public class ShopService {
         shopInDatabase.setUpdatedAt(new Date());
         shopMapper.updateByPrimaryKey(shopInDatabase);
         return shopInDatabase;
+    }
+
+    public Shop getShopById(long shopId) {
+        ShopExample okStatus = new ShopExample();
+        okStatus.createCriteria()
+                .andIdEqualTo(shopId)
+                .andStatusEqualTo(DataStatus.OK.name());
+        List<Shop> shops = shopMapper.selectByExample(okStatus);
+        if (shops.isEmpty()) {
+            throw HttpException.notFound("店铺未找到：" + shopId);
+        }
+        return shops.get(0);
     }
 }

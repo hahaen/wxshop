@@ -81,7 +81,6 @@ http {
     server{
         location /api {
             proxy_pass http://app;
-            proxy_cookie_path / "/; httponly; secure; SameSite=None";
         }
         location / {
             root   /static;
