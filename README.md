@@ -1,17 +1,17 @@
 **微型电商项目**
 
-**预览地址：**[http://hahaen.xyz:5000](http://hahaen.xyz:5000)
+**预览地址：**[http://150.158.194.237:5000/](http://150.158.194.237:5000/)
 
 * 创建数据库
 
 ```
-docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wxshop mysql
+docker run --name wxshop -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wxshop mysql
 ```
 
 * 测试
 
 ```
-docker run -d -p 3307:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wxshop mysql
+docker run --name wxshop -d -p 3307:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wxshop mysql
 ```
 
 ```
